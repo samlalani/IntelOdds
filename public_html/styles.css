@@ -1,0 +1,2476 @@
+/*---------------------------------------------------------------------------------------------*/
+/* CSS Root Variables for Table Column Layout */
+/*---------------------------------------------------------------------------------------------*/
+:root
+    {
+    --time-col-width: 80px;
+    --rot-col-width: 60px;
+    --matchup-col-width: 200px;
+    --scores-col-width: 115px;
+    --sportsbook-col-width: 100px;
+    --header-height: 120px; /* Approximate height of header content */
+    --footer-height: 60px;  /* Approximate height of footer content */
+    --zoom-factor: 1;
+    }
+/*---------------------------------------------------------------------------------------------*/
+/* Zoom Controls Styles */
+/*---------------------------------------------------------------------------------------------*/
+.zoom-controls
+    {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-right: 12px;
+    }
+
+.zoom-button
+    {
+    width: 28px;
+    height: 28px;
+    border: 1px solid #d1d5db;
+    background: white;
+    color: #374151;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+    }
+
+.zoom-button:hover
+    {
+    background-color: #f3f4f6;
+    }
+
+.zoom-button:disabled
+    {
+    opacity: 0.5;
+    cursor: not-allowed;
+    }
+
+#zoom-percentage
+    {
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+    min-width: 40px;
+    text-align: center;
+    }
+/*---------------------------------------------------------------------------------------------*/
+body
+    {
+    font-family: 'Inter', sans-serif;
+    background-color: #f3f4f6;
+    color: #1f2937;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    overflow: hidden;
+    font-size: calc(14px * var(--zoom-factor));
+    }
+/*---------------------------------------------------------------------------------------------*/
+.odds-container
+    {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    padding: 4px !important;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    }
+
+#login-section
+    {
+    width: 405px;
+    min-width: 405px;
+    max-width: 405px;
+    }
+
+.flex-row-header
+    {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 2rem;
+    }
+
+/*---------------------------------------------------------------------------------------------*/
+/* Fixed header section */
+.odds-container > h1,
+.odds-container > #login-section,
+.odds-container > #status-area
+    {
+    flex-shrink: 0;
+    background-color: white;
+    z-index: 30;
+    }
+/*---------------------------------------------------------------------------------------------*/
+/* Scrollable content section */
+#data-section
+    {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0; /* Important for Firefox */
+    overflow-x: auto;
+    margin-top: 4px !important;
+    }
+/*---------------------------------------------------------------------------------------------*/
+/* Scrollable table container */
+#odds-table-target
+    {
+    flex: 1;
+    width: 100%;
+    min-width: 0;
+    overflow-x: auto;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    scroll-behavior: smooth;
+    }
+/*---------------------------------------------------------------------------------------------*/
+/* Styles for login form */
+/*---------------------------------------------------------------------------------------------*/
+.login-form input
+    {
+    display: block;
+    width: 100%;
+    padding: 0.5rem;
+    margin-bottom: 0.25rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    }
+/*---------------------------------------------------------------------------------------------*/
+.login-form button
+    {
+    padding: 0.6rem 1.2rem;
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    }
+/*---------------------------------------------------------------------------------------------*/
+.login-form button:hover
+    {
+    background-color: #2563eb;
+    }
+/*---------------------------------------------------------------------------------------------*/
+.login-form button:disabled
+    {
+    background-color: #9ca3af;
+    cursor: not-allowed;
+    }
+/*---------------------------------------------------------------------------------------------*/
+.table-container
+    {
+    width: 100%;
+    min-width: 0;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    }
+/*---------------------------------------------------------------------------------------------*/
+table
+    {
+    width: auto;
+    border-collapse: separate !important;
+    border-spacing: 0;
+    table-layout: fixed !important;
+    }
+/*---------------------------------------------------------------------------------------------*/
+th, td
+    {
+    padding: calc(0.25rem * var(--zoom-factor));
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+    vertical-align: middle;
+    }
+/*---------------------------------------------------------------------------------------------*/
+/* General sticky header behavior */
+th
+    {
+    background-color: #f9fafb;
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    text-align: center;
+    z-index: 10; /* z-index for headers that only scroll top */
+    }
+
+/* Column 1: Time */
+td:first-child
+    {
+    position: sticky;
+    left: 0px;
+    z-index: 15;
+    }
+
+th:first-child
+    {
+    position: sticky;
+    left: 0px;
+    z-index: 20; /* Higher z-index to stay on top corner */
+    }
+
+/* Column 2: ROT */
+td:nth-child(2)
+    {
+    position: sticky;
+    left: calc(var(--time-col-width) * var(--zoom-factor));
+    z-index: 15;
+    }
+
+th:nth-child(2)
+    {
+    position: sticky;
+    left: calc(var(--time-col-width) * var(--zoom-factor));
+    z-index: 20;
+    }
+
+/* Column 3: Matchup */
+td:nth-child(3)
+    {
+    position: sticky;
+    left: calc((var(--time-col-width) + var(--rot-col-width)) * var(--zoom-factor));
+    z-index: 15;
+    }
+
+th:nth-child(3)
+    {
+    position: sticky;
+    left: calc((var(--time-col-width) + var(--rot-col-width)) * var(--zoom-factor));
+    z-index: 20;
+    }
+
+/* Column 4: Scores */
+td:nth-child(4)
+    {
+    position: sticky;
+    left: calc((var(--time-col-width) + var(--rot-col-width) + var(--matchup-col-width)) * var(--zoom-factor));
+    z-index: 15;
+    }
+
+th:nth-child(4)
+    {
+    position: sticky;
+    left: calc((var(--time-col-width) + var(--rot-col-width) + var(--matchup-col-width)) * var(--zoom-factor));
+    z-index: 20;
+    }
+
+
+/* --- Also, UPDATE the width rules to target BOTH th and td --- */
+/* (This ensures the columns stay aligned) */
+
+th:first-child, td:first-child
+    {
+    width: calc(var(--time-col-width) * var(--zoom-factor));
+    min-width: calc(var(--time-col-width) * var(--zoom-factor));
+    }
+
+th:nth-child(2), td:nth-child(2)
+    {
+    width: calc(var(--rot-col-width) * var(--zoom-factor));
+    min-width: calc(var(--rot-col-width) * var(--zoom-factor));
+    }
+
+th:nth-child(3), td:nth-child(3)
+    {
+    width: calc(var(--matchup-col-width) * var(--zoom-factor)) !important;
+    min-width: calc(var(--matchup-col-width) * var(--zoom-factor)) !important;
+    max-width: calc(var(--matchup-col-width) * var(--zoom-factor)) !important;
+    }
+
+th:nth-child(4), td:nth-child(4)
+    {
+    width: calc(var(--scores-col-width) * var(--zoom-factor)) !important;
+    min-width: calc(var(--scores-col-width) * var(--zoom-factor)) !important;
+    }
+
+/*---------------------------------------------------------------------------------------------*/
+/* Columns 5+: Sportsbooks */
+th:nth-child(n+5),
+td:nth-child(n+5)
+    {
+    width: calc(var(--sportsbook-col-width) * var(--zoom-factor)) !important;
+    min-width: calc(var(--sportsbook-col-width) * var(--zoom-factor)) !important;
+    max-width: calc(var(--sportsbook-col-width) * var(--zoom-factor)) !important;
+    }
+/*---------------------------------------------------------------------------------------------*/
+th
+    {
+    background-color: #f9fafb;
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    text-align: center;
+    font-size: calc(12px * var(--zoom-factor)) !important; /* 85% of 14px */
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    height: calc(28px * var(--zoom-factor)) !important;
+    line-height: calc(20px * var(--zoom-factor)) !important;
+    padding-top: calc(2px * var(--zoom-factor)) !important;
+    padding-bottom: calc(2px * var(--zoom-factor)) !important;
+    padding-left: calc(2px * var(--zoom-factor)) !important;
+    padding-right: calc(2px * var(--zoom-factor)) !important;
+    }
+/*---------------------------------------------------------------------------------------------*/
+td
+    {
+    font-size: calc(14px * var(--zoom-factor));
+    line-height: 1.4;
+    white-space: nowrap;
+    }
+/*---------------------------------------------------------------------------------------------*/
+.matchup-cell div
+    {
+    line-height: 1.3;
+    }
+/*---------------------------------------------------------------------------------------------*/
+.matchup-cell .team-name
+    {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-top: calc(2px * var(--zoom-factor));
+    padding-bottom: calc(2px * var(--zoom-factor));
+    line-height: 1.1;
+    font-size: calc(14px * var(--zoom-factor));
+    }
+
+.matchup-cell .team-name.winner
+    {
+    font-weight: bold;
+    }
+/* Apply the same style to date, time, and rotation numbers for alignment */
+.date-time .date,
+.date-time .time,
+.time-row,
+.rotation-numbers span
+    {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-top: calc(2px * var(--zoom-factor));
+    padding-bottom: calc(2px * var(--zoom-factor));
+    line-height: 1.1;
+    font-size: calc(14px * var(--zoom-factor));
+    }
+/*---------------------------------------------------------------------------------------------*/
+.odds-cell div
+    {
+    line-height: 1.3;
+    }
+/*---------------------------------------------------------------------------------------------*/
+.odds-cell .odds-value
+    {
+    text-align: right;
+    display: block;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    line-height: 1.1;
+    font-size: calc(14px * var(--zoom-factor));
+    }
+/*---------------------------------------------------------------------------------------------*/
+.status-message, .error-message
+    {
+    text-align: center;
+    font-size: calc(16px * var(--zoom-factor));
+    border-radius: calc(0.375rem * var(--zoom-factor));
+    }
+/*---------------------------------------------------------------------------------------------*/
+.status-message
+    {
+    background-color: #e0f2fe;
+    color: #0c4a6e;
+    }
+/*---------------------------------------------------------------------------------------------*/
+.error-message
+    {
+    background-color: #fee2e2;
+    color: #991b1b;
+    }
+/*---------------------------------------------------------------------------------------------*/
+.hidden
+    {
+    display: none;
+    }
+/*---------------------------------------------------------------------------------------------*/
+.date-time
+    {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.3;
+    }
+/*---------------------------------------------------------------------------------------------*/
+.date-time .date
+    {
+    font-size: calc(14px * var(--zoom-factor));
+    }
+/*---------------------------------------------------------------------------------------------*/
+.date-time .time
+    {
+    font-size: calc(14px * var(--zoom-factor));
+    }
+
+/*---------------------------------------------------------------------------------------------*/
+/* Time Column Styles */
+/*---------------------------------------------------------------------------------------------*/
+.time-column
+    {
+    min-width: var(--time-col-width);
+    width: var(--time-col-width);
+    }
+
+.time-display
+    {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 2px;
+    }
+
+.time-row
+    {
+    font-size: calc(14px * var(--zoom-factor));
+    font-weight: 500;
+    color: #374151;
+    line-height: 1.2;
+    }
+
+.time-icons
+    {
+    display: flex;
+    gap: 1px;
+    align-items: center;
+    justify-content: center;
+    }
+
+.time-icon
+    {
+    font-size: calc(12px * var(--zoom-factor));
+    cursor: pointer;
+    padding: 1px;
+    border-radius: 2px;
+    transition: all 0.2s ease;
+    user-select: none;
+    }
+
+.time-icon:hover
+    {
+    background-color: #f3f4f6;
+    transform: scale(1.1);
+    }
+
+.time-icon:active
+    {
+    transform: scale(0.95);
+    }
+
+.injury-icon
+    {
+    color: #dc2626;
+    }
+
+.red-cross
+    {
+    position: relative;
+    width: calc(14px * var(--zoom-factor));
+    height: calc(14px * var(--zoom-factor));
+    background-color: white;
+    border-radius: 50%;
+    display: inline-block;
+    }
+
+.red-cross::before,
+.red-cross::after
+    {
+    content: '';
+    position: absolute;
+    background-color: #dc2626;
+    }
+
+.red-cross::before
+    {
+    width: calc(3px * var(--zoom-factor));
+    height: calc(10px * var(--zoom-factor));
+    top: calc(2px * var(--zoom-factor));
+    left: calc(5.5px * var(--zoom-factor));
+    }
+
+.red-cross::after
+    {
+    width: calc(10px * var(--zoom-factor));
+    height: calc(3px * var(--zoom-factor));
+    top: calc(5.5px * var(--zoom-factor));
+    left: calc(2px * var(--zoom-factor));
+    }
+
+.weather-icon
+    {
+    color: #f59e0b;
+    }
+
+.tv-icon
+    {
+    color: #3b82f6;
+    }
+
+.location-icon
+    {
+    color: #10b981;
+    }
+/*---------------------------------------------------------------------------------------------*/
+.score-container
+    {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: calc(0.5rem * var(--zoom-factor)) !important;
+    width: 100% !important;
+    min-height: calc(2.6rem * var(--zoom-factor)) !important;
+    }
+/*---------------------------------------------------------------------------------------------*/
+.scores-column
+    {
+    text-align: right !important;
+    }
+/*---------------------------------------------------------------------------------------------*/
+.status-column
+    {
+    text-align: left !important;
+    }
+/*---------------------------------------------------------------------------------------------*/
+.score-value
+    {
+    font-size: calc(14px * var(--zoom-factor));
+    line-height: 1.4;
+    color: #374151;
+    display: block;
+    }
+/*---------------------------------------------------------------------------------------------*/
+tr.score-final td:nth-child(-n+4)
+    {
+    background-color: #dc2626 !important; /* red */
+    color: white !important;
+    }
+/*---------------------------------------------------------------------------------------------*/
+/* Style elements within those specific columns */
+tr.score-active td:nth-child(-n+4) *,
+tr.score-final td:nth-child(-n+4) *
+    {
+    color: white !important;
+    }
+/*---------------------------------------------------------------------------------------------*/
+.rotation-numbers
+    {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.3;
+    text-align: center;
+    cursor: move;
+    user-select: none;
+    font-size: calc(14px * var(--zoom-factor));
+    }
+
+.team-info-container
+    {
+    display: grid;
+    grid-template-columns: calc(40px * var(--zoom-factor)) 1fr;
+    width: 100%;
+    gap: calc(2px * var(--zoom-factor));
+    align-items: center;
+    }
+
+.team-abbr
+    {
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    }
+
+.pitcher-name
+    {
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    position: relative;
+    }
+
+
+
+
+
+.tennis-sets-container
+    {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    width: 100%;
+    gap: calc(2px * var(--zoom-factor));
+    position: relative;
+    }
+
+.tennis-set
+    {
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    }
+
+.tennis-set sup
+    {
+    font-size: calc(0.7em * var(--zoom-factor));
+    position: relative;
+    top: -0.5em;
+    margin-left: calc(1px * var(--zoom-factor));
+    }
+
+.sportsbook-container
+    {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    }
+
+/* Time-based odds background colors */
+.odds-value
+    {
+    transition: background-color 0.3s ease, color 0.3s ease;
+    padding: calc(2px * var(--zoom-factor)) calc(4px * var(--zoom-factor));
+    border-radius: calc(2px * var(--zoom-factor));
+    }
+
+.odds-recent
+    {
+    background-color: #dc2626; /* Red background */
+    color: white;
+    }
+
+.odds-medium
+    {
+    background-color: #fcd34d; /* Yellow background */
+    color: black;
+    }
+
+.odds-old
+    {
+    background-color: #86efac; /* Green background */
+    color: black;
+    }
+
+.score-value.winner-text
+    {
+    color: #059669;
+    font-weight: bold;
+    text-align: center;
+    width: auto;
+    grid-column: 1 / -1;
+    }
+
+/* When .score-container contains a .winner-text element, adjust the grid layout */
+.score-container:has(.winner-text)
+    {
+    grid-template-columns: 1fr !important;
+    justify-items: center;
+    }
+
+.score-container:has(.winner-text) .scores-column
+    {
+    width: 100% !important;
+    }
+
+/*
+ * FIX: Set backgrounds for sticky columns, prioritizing active/final states.
+ */
+
+/* Default backgrounds for sticky columns in normal rows */
+tr.bg-white:not(.score-active):not(.score-final) td:nth-child(-n+4)
+    {
+    background-color: #ffffff !important;
+    }
+
+tr.bg-gray-50:not(.score-active):not(.score-final) td:nth-child(-n+4)
+    {
+    background-color: #f3f4f6 !important;
+    }
+
+/* Backgrounds for sticky columns in active or final rows */
+tr.score-active td:nth-child(-n+4)
+    {
+    background-color: #166534 !important; /* dark green */
+    }
+
+tr.score-final td:nth-child(-n+4)
+    {
+    background-color: #dc2626 !important; /* red */
+    }
+
+/* Highlighted rows with active/final game states - use washed out colors */
+tr.score-active.highlighted td:nth-child(-n+4)
+    {
+    background-color: #9CAF88 !important; /* washed out green */
+    color: #000 !important; /* black text for readability */
+    }
+
+tr.score-final.highlighted td:nth-child(-n+4)
+    {
+    background-color: #F4A4A4 !important; /* washed out red */
+    color: #000 !important; /* black text for readability */
+    }
+
+.top-bar
+    {
+    display: flex;
+    align-items: stretch;
+    gap: 1rem;
+    }
+
+#disconnect-button
+    {
+    position: static;
+    width: auto;
+    min-width: 0;
+    margin: 0;
+    padding: calc(0.6rem * var(--zoom-factor)) calc(2.5rem * var(--zoom-factor)); /* Match the connect button's padding */
+    border-radius: calc(0.375rem * var(--zoom-factor)); /* Ensure radius is also consistent */
+    background-color: #ef4444;
+    color: white;
+    font-size: calc(16px * var(--zoom-factor));
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+    }
+
+#disconnect-button:hover
+    {
+    background-color: #dc2626;
+    }
+
+#status-area
+    {
+    flex: 1 1 0%;
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    }
+
+#odds-table-target h1
+    {
+    position: sticky;
+    left: 0;
+    background: white;
+    z-index: 25;
+    }
+
+#connect-button
+    {
+    position: static;
+    width: auto;
+    min-width: 0;
+    margin: 0;
+    padding: calc(0.6rem * var(--zoom-factor)) calc(2.5rem * var(--zoom-factor));
+    border-radius: calc(0.375rem * var(--zoom-factor));
+    background-color: #3b82f6; /* Blue to match bg-blue-500 */
+    color: white;
+    font-size: calc(16px * var(--zoom-factor));
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+    }
+
+#connect-button:hover
+    {
+    background-color: #2563eb; /* Blue to match hover:bg-blue-600 */
+    }
+/* Styles for the new header layout */
+.page-header
+    {
+    display: flex;
+    align-items: center;
+    gap: calc(2px * var(--zoom-factor)) !important;
+    padding-bottom: calc(2px * var(--zoom-factor)) !important;
+    border-bottom: 1px solid #e5e7eb;
+    }
+
+/* This new class pushes the controls to the right edge */
+.spacer
+    {
+    flex-grow: 1;
+    }
+
+/* Style for the login inputs container */
+.login-form
+    {
+    display: flex;
+    flex-direction: column; /* Stacks the inputs vertically */
+    gap: calc(0.5rem * var(--zoom-factor));
+    width: calc(300px * var(--zoom-factor)); /* Or adjust as needed */
+    }
+
+/* General styling for controls in the header */
+.controls-group
+    {
+    display: flex;
+    align-items: center;
+    gap: calc(0.5rem * var(--zoom-factor));
+    color: #4b5563;
+    font-size: calc(14px * var(--zoom-factor));
+    }
+/* New style for the sticky header */
+.sticky-header
+    {
+    position: sticky;
+    top: 0px !important;
+    z-index: 30; /* Ensures the header stays on top of other content */
+    }
+
+/* Give the sticky header's cells a solid background to prevent
+   content from showing through as it scrolls underneath. */
+.sticky-header th
+    {
+    background-color: #f3f4f6; /* A light gray background */
+    }
+
+/* Drag and Drop Styles */
+th[data-sportsbook]
+    {
+    cursor: move;
+    user-select: none;
+    transition: background-color 0.2s;
+    }
+
+th[data-sportsbook]:hover
+    {
+    background-color: #e5e7eb;
+    }
+
+th[data-sportsbook].dragging
+    {
+    opacity: 0.5;
+    background-color: #e5e7eb;
+    }
+
+th[data-sportsbook].drag-over
+    {
+    background-color: #dbeafe !important; /* Light blue background */
+    border: 2px solid #93c5fd !important; /* Light blue border - more performant than box-shadow */
+    }
+
+/* Ensure the cursor-move class is applied */
+.cursor-move
+    {
+    cursor: move !important;
+    }
+
+/* Group Header Drag and Drop Styles */
+h1[data-group]
+    {
+    cursor: move;
+    user-select: none;
+    transition: background-color 0.2s, transform 0.2s;
+    padding: calc(0.5rem * var(--zoom-factor));
+    border-radius: calc(0.25rem * var(--zoom-factor));
+    margin: 0;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: calc(20px * var(--zoom-factor)) !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    }
+
+h1[data-group]:hover
+    {
+    background-color: #e5e7eb;
+    }
+
+h1[data-group].dragging
+    {
+    opacity: 0.5;
+    background-color: #d1d5db;
+    transform: scale(1.02);
+    }
+
+h1[data-group].drag-over
+    {
+    background-color: #dbeafe !important; /* Light blue background */
+    box-shadow: 0 0 0 2px #93c5fd; /* Light blue border */
+    }
+
+/* Event Row Drag and Drop Styles */
+tr[data-rotation]
+    {
+    user-select: none;
+    transition: background-color 0.2s;
+    }
+
+tr[data-rotation].dragging
+    {
+    opacity: 0.5;
+    background-color: #d1d5db !important;
+    }
+
+tr[data-rotation].drag-over
+    {
+    background-color: #dbeafe !important;
+    border: 2px dashed #3b82f6;
+    }
+
+/*---------------------------------------------------------------------------------------------*/
+/* Sports Menu Styles */
+/*---------------------------------------------------------------------------------------------*/
+.selected-league-right
+    {
+    margin-left: auto;
+    background-color: #3b82f6;
+    color: white;
+    border-radius: calc(0.375rem * var(--zoom-factor));
+    padding: calc(2px * var(--zoom-factor)) calc(12px * var(--zoom-factor));
+    font-size: calc(15px * var(--zoom-factor));
+    font-weight: 500;
+    align-self: center;
+    display: flex;
+    align-items: center;
+    height: calc(28px * var(--zoom-factor));
+    min-width: calc(40px * var(--zoom-factor));
+    max-width: calc(200px * var(--zoom-factor));
+    white-space: nowrap;
+    box-shadow: none;
+    }
+
+#sports-menu
+    {
+    display: flex;
+    flex-wrap: wrap;
+    gap: calc(2px * var(--zoom-factor)) !important;
+    position: relative;
+    margin-top: 0 !important;
+    margin-bottom: calc(8px * var(--zoom-factor)) !important;
+    padding: calc(4px * var(--zoom-factor)) !important;
+    align-items: center;
+    }
+
+.sports-menu-header
+    {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    }
+
+.sports-menu-content
+    {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: calc(2px * var(--zoom-factor)) !important;
+    align-items: center;
+    }
+
+.add-custom-display-button
+    {
+    width: 32px;
+    height: 32px;
+    border: 2px solid #3b82f6;
+    background: white;
+    color: #3b82f6;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    margin-left: 12px;
+    flex-shrink: 0;
+    }
+
+.add-custom-display-button:hover
+    {
+    background: #3b82f6;
+    color: white;
+    transform: scale(1.1);
+    }
+
+.add-custom-display-button:active
+    {
+    transform: scale(0.95);
+    }
+
+.custom-display-item
+    {
+    position: relative;
+    background: linear-gradient(135deg, #e0f2fe 0%, #b3e5fc 100%);
+    border: 1px solid #81d4fa;
+    border-radius: 8px;
+    }
+
+.custom-display-item .sport-link::before
+    {
+    content: "⭐ ";
+    margin-right: 4px;
+    }
+
+.delete-custom-display-button
+    {
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    border: 1px solid #ef4444;
+    background: white;
+    color: #ef4444;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    opacity: 0;
+    }
+
+.custom-display-item:hover .delete-custom-display-button
+    {
+    opacity: 1;
+    }
+
+.delete-custom-display-button:hover
+    {
+    background: #ef4444;
+    color: white;
+    }
+
+.custom-display-name-input
+    {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 14px;
+    margin-bottom: 16px;
+    }
+
+.custom-display-name-input:focus
+    {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+.custom-display-name-input.error
+    {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+    }
+
+.custom-display-input-container
+    {
+    margin-bottom: 16px;
+    padding: 12px;
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    }
+
+.custom-display-label
+    {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #374151;
+    font-size: 14px;
+    }
+
+.sport-item
+    {
+    position: relative;
+    display: inline-block;
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+    }
+
+.sport-link
+    {
+    display: block;
+    padding: calc(0.25rem * var(--zoom-factor)) calc(0.75rem * var(--zoom-factor)); /* smaller vertical padding */
+    background-color: #f3f4f6;
+    color: #374151;
+    text-decoration: none;
+    border-radius: calc(0.375rem * var(--zoom-factor));
+    font-weight: 700; /* bold */
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    font-size: calc(16px * var(--zoom-factor));
+    line-height: 1.1;
+    }
+
+.sport-link:hover
+    {
+    background-color: #e5e7eb;
+    color: #1f2937;
+    }
+
+.sport-link.selected
+    {
+    background-color: #dbeafe;
+    color: #1e40af;
+    }
+
+.sport-link
+    {
+    transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+.leagues-submenu
+    {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: white;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    min-width: 200px;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.2s ease;
+    }
+
+.sport-item:hover .leagues-submenu
+    {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    }
+
+.league-item
+    {
+    position: relative;
+    }
+
+.league-link
+    {
+    display: block;
+    padding: calc(0.5rem * var(--zoom-factor)) calc(1rem * var(--zoom-factor));
+    color: #374151;
+    text-decoration: none;
+    font-size: calc(14px * var(--zoom-factor));
+    transition: background-color 0.2s ease;
+    white-space: nowrap;
+    }
+
+.league-link:hover
+    {
+    background-color: #f3f4f6;
+    color: #1f2937;
+    }
+
+.league-link
+    {
+    transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+.sub-leagues-submenu
+    {
+    position: absolute;
+    top: 0;
+    left: 100%;
+    background-color: white;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    min-width: 200px;
+    z-index: 1001;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-10px);
+    transition: all 0.2s ease;
+    }
+
+.league-item:hover .sub-leagues-submenu
+    {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+    }
+
+.sub-league-link
+    {
+    display: block;
+    padding: calc(0.5rem * var(--zoom-factor)) calc(1rem * var(--zoom-factor));
+    color: #374151;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+    white-space: nowrap;
+    font-size: calc(14px * var(--zoom-factor));
+    }
+
+.sub-league-link:hover
+    {
+    background-color: #f3f4f6;
+    color: #1f2937;
+    }
+
+/* Tighter vertical spacing for odds cells */
+.odds-cell
+    {
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+    }
+.odds-cell .odds-value
+    {
+    padding-top: 0px;
+    padding-bottom: 0px;
+    line-height: 1.1;
+    }
+
+/* Align odds and names horizontally */
+.matchup-cell,
+.odds-cell
+    {
+    padding-top: 2px !important;
+    padding-bottom: 2px !important;
+    }
+
+/* Remove zero padding overrides for .odds-value */
+.odds-cell .odds-value
+    {
+    padding-top: 2px;
+    padding-bottom: 2px;
+    line-height: 1.1;
+    }
+
+.tennis-ball
+    {
+    display: inline-block;
+    width: calc(12px * var(--zoom-factor));
+    height: calc(12px * var(--zoom-factor));
+    background-color: #ccff00;
+    border-radius: 50%;
+    position: relative;
+    margin: 0 calc(2px * var(--zoom-factor));
+    vertical-align: middle;
+    transform: translateY(-1px);
+    box-shadow: inset calc(-2px * var(--zoom-factor)) calc(-2px * var(--zoom-factor)) calc(3px * var(--zoom-factor)) rgba(0,0,0,0.2);
+    }
+
+.score-cell.cancelled-or-postponed
+    {
+    vertical-align: middle;
+    height: calc(48px * var(--zoom-factor));
+    min-height: calc(48px * var(--zoom-factor));
+    padding: 0;
+    }
+.score-cell.cancelled-or-postponed > div
+    {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+    font-weight: bold;
+    }
+
+.date-time,
+.time-display,
+.rotation-numbers,
+.matchup-cell div
+    {
+    line-height: 1.1;
+    padding: 0;
+    margin: 0;
+    border: none;
+    }
+
+/* Ensure black text on yellow or green backgrounds for scores */
+.score-value[style*="background: yellow"],
+.score-value[style*="background-color: yellow"],
+.score-value[style*="background: #fcd34d"],
+.score-value[style*="background-color: #fcd34d"],
+.score-value[style*="background: #86efac"],
+.score-value[style*="background-color: #86efac"],
+.score-cell[style*="background: yellow"],
+.score-cell[style*="background-color: yellow"],
+.score-cell[style*="background: #fcd34d"],
+.score-cell[style*="background-color: #fcd34d"],
+.score-cell[style*="background: #86efac"],
+.score-cell[style*="background-color: #86efac"]
+    {
+    color: #000 !important;
+    }
+
+/* Hide leagues/sub-leagues pull-down when force-hide is applied */
+.leagues-submenu.force-hide,
+.sub-leagues-submenu.force-hide
+    {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    transform: translateY(-10px) !important;
+    }
+
+/* Remove the selected-view-label styles since we're now highlighting menu items instead */
+/*
+th:first-child, td:first-child,
+th:nth-child(2), td:nth-child(2),
+th:nth-child(3), td:nth-child(3),
+th:nth-child(4), td:nth-child(4) {
+    background-color: #fff !important;
+    z-index: 20;
+}
+*/
+/* Apply white background ONLY to sticky data cells (td) */
+td:first-child,
+td:nth-child(2),
+td:nth-child(3),
+td:nth-child(4)
+    {
+    background-color: #fff !important;
+    }
+
+/* Ensure sticky header cells (th) have the correct z-index to stay on top */
+th:first-child,
+th:nth-child(2),
+th:nth-child(3),
+th:nth-child(4)
+    {
+    z-index: 20;
+    }
+
+tbody > tr:nth-child(odd)
+    {
+    background-color: #fff !important;
+    }
+
+tbody > tr:nth-child(even)
+    {
+    background-color: #f1f5f9 !important;
+    }
+
+tbody > tr:nth-child(even) td,
+tbody > tr:nth-child(even) th
+    {
+    background-color: #f1f5f9 !important;
+    }
+
+thead tr, thead th, .sticky-header th
+    {
+    background-color: #111 !important;
+    color: #fff !important;
+    }
+
+/*---------------------------------------------------------------------------------------------*/
+/* Row Highlighting */
+/*---------------------------------------------------------------------------------------------*/
+tr.highlighted
+    {
+    background-color: #FFF77E !important; /* Custom yellow highlight color */
+    }
+
+tr.highlighted td,
+tr.highlighted th
+    {
+    background-color: #FFF77E !important;
+    }
+
+/* Ensure highlighted rows maintain their state even with alternating row colors */
+tbody > tr:nth-child(odd).highlighted,
+tbody > tr:nth-child(even).highlighted
+    {
+    background-color: #FFF77E !important;
+    }
+
+/* Override alternating row colors for highlighted rows */
+tbody > tr:nth-child(odd).highlighted,
+tbody > tr:nth-child(even).highlighted,
+tbody > tr:nth-child(odd).highlighted td,
+tbody > tr:nth-child(even).highlighted td,
+tbody > tr:nth-child(odd).highlighted th,
+tbody > tr:nth-child(even).highlighted th
+    {
+    background-color: #FFF77E !important;
+    }
+
+/* Clickable matchup cell styling */
+.matchup-cell[onclick]
+    {
+    cursor: pointer;
+    }
+
+/* Sportsbook Context Menu */
+.sportsbook-context-menu
+    {
+    position: fixed;
+    background: white;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    z-index: 1000;
+    min-width: 200px;
+    display: none;
+    }
+
+.sportsbook-context-menu.show
+    {
+    display: block;
+    }
+
+.sportsbook-context-menu-item
+    {
+    padding: calc(0.5rem * var(--zoom-factor)) calc(1rem * var(--zoom-factor));
+    cursor: pointer;
+    font-size: calc(14px * var(--zoom-factor));
+    color: #374151;
+    border-bottom: 1px solid #f3f4f6;
+    transition: background-color 0.2s;
+    }
+
+.sportsbook-context-menu-item:last-child
+    {
+    border-bottom: none;
+    }
+
+.sportsbook-context-menu-item:hover
+    {
+    background-color: #f3f4f6;
+    color: #1f2937;
+    }
+
+.sportsbook-context-menu-item.disabled
+    {
+    color: #9ca3af;
+    cursor: not-allowed;
+    }
+
+.sportsbook-context-menu-item.disabled:hover
+    {
+    background-color: transparent;
+    }
+
+/* Sportsbook highlighting */
+td.sportsbook-highlighted
+    {
+    background-color: #FFF77E !important;
+    }
+
+/* Override alternating row colors for sportsbook highlights */
+tbody > tr:nth-child(odd) td.sportsbook-highlighted,
+tbody > tr:nth-child(even) td.sportsbook-highlighted
+    {
+    background-color: #FFF77E !important;
+    }
+
+/* Handle sportsbook highlights in active/final games */
+tr.score-active td.sportsbook-highlighted
+    {
+    background-color: #9CAF88 !important; /* washed out green */
+    color: #000 !important; /* black text for readability */
+    }
+
+tr.score-final td.sportsbook-highlighted
+    {
+    background-color: #F4A4A4 !important; /* washed out red */
+    color: #000 !important; /* black text for readability */
+    }
+
+
+
+/* Bold team abbreviation only when game is final and team has won */
+tr.score-final .team-abbr.winner,
+tr.score-final .team-name.winner
+    {
+    font-weight: bold;
+    }
+
+/*---------------------------------------------------------------------------------------------*/
+/* Winner text styling in scores column */
+.scores-column .score-value:contains("Winner")
+    {
+    text-align: center;
+    font-weight: bold;
+    color: #059669; /* Green color for winner */
+    }
+
+/* Alternative approach for winner styling */
+.score-value[data-winner="true"]
+    {
+    text-align: center;
+    font-weight: bold;
+    color: #059669; /* Green color for winner */
+    }
+
+/* Make scores-column take full width when there's a winner (no status column) */
+.score-container:not(:has(.status-column)) .scores-column
+    {
+    width: 100% !important;
+    }
+/*---------------------------------------------------------------------------------------------*/
+/* Ensure black text on yellow or green backgrounds for scores */
+/*
+  Final Fix: This rule targets BOTH regular scores (.score-value)
+  and tennis set scores (.tennis-set) to override the text color
+  when they have a timed background update in an active game.
+*/
+tr.score-active .score-cell .score-value.odds-medium,
+tr.score-active .score-cell .score-value.odds-old,
+tr.score-active .score-cell .tennis-set.odds-medium,
+tr.score-active .score-cell .tennis-set.odds-old,
+tr.score-final  .score-cell .score-value.odds-medium,
+tr.score-final  .score-cell .score-value.odds-old,
+tr.score-final  .score-cell .tennis-set.odds-medium,
+tr.score-final  .score-cell .tennis-set.odds-old,
+tr.score-active .score-cell .score-value.odds-medium sup,
+tr.score-active .score-cell .score-value.odds-old sup,
+tr.score-active .score-cell .tennis-set.odds-medium sup,
+tr.score-active .score-cell .tennis-set.odds-old sup,
+tr.score-final  .score-cell .score-value.odds-medium sup,
+tr.score-final  .score-cell .score-value.odds-old sup,
+tr.score-final  .score-cell .tennis-set.odds-medium sup,
+tr.score-final  .score-cell .tennis-set.odds-old sup
+    {
+    color: #000 !important; /* Force black text */
+    }
+
+.tennis-ball-left
+    {
+    position: absolute;
+    left: 0;
+    top: 0%;
+    transform: translate(-170%);
+    width: 12px; /* Match the .tennis-ball width for the transform */
+    height: 12px; /* Match the .tennis-ball height for centering */
+    pointer-events: none;
+    }
+
+/* Left hand image for left-handed pitchers */
+.left-hand-image
+    {
+    display: inline-block;
+    width: calc(16px * var(--zoom-factor));
+    height: calc(16px * var(--zoom-factor));
+    background-image: url('images/left-hand.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    vertical-align: middle;
+    margin-left: calc(2px * var(--zoom-factor));
+    }
+
+/*---------------------------------------------------------------------------------------------*/
+/* Sticky Group Headers */
+/*---------------------------------------------------------------------------------------------*/
+
+/* Original rule */
+#odds-table-target h1[data-group]
+    {
+    position: sticky;
+    top: 0;
+    z-index: 25;
+    background: white;
+    }
+
+#odds-table-target.sticky-columns-on-top h1[data-group]
+    {
+    top: 25px !important;
+    }
+
+/* Modify these lines */
+h1[data-group]
+    {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: #fff;
+    line-height: 1.2;
+    margin: 0;
+    padding: 2px 0.5rem;
+    width: 100%;
+    box-sizing: border-box;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: calc(20px * var(--zoom-factor)) !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    }
+
+/* When the sticky column header is present, shift group header down */
+#odds-table-target .sticky-header + h1[data-group],
+#odds-table-target .sticky-header + .table-container + h1[data-group]
+    {
+    top: 0px !important;
+    }
+
+/* Sticky group header for each table container (when column headers are not on top) */
+.table-container h1[data-group]
+    {
+    min-height: 40px;
+    height: 40px;
+    line-height: 40px;
+    position: sticky;
+    top: 0;
+    z-index: 25;
+    background: white;
+    margin: 0 !important;
+    padding: 0 0.5rem !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    }
+
+/* Sticky thead below the group header */
+.table-container thead
+    {
+    position: sticky;
+    top: calc(29px * var(--zoom-factor)) !important;
+    z-index: 20;
+    background: #f9fafb;
+    }
+
+/*---------------------------------------------------------------------------------------------*/
+/* Hamburger Menu Styles */
+/*---------------------------------------------------------------------------------------------*/
+.hamburger-menu
+    {
+    position: relative;
+    display: inline-block;
+    }
+
+.hamburger-button
+    {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    width: calc(30px * var(--zoom-factor));
+    height: calc(30px * var(--zoom-factor));
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    z-index: 1000;
+    }
+
+.hamburger-button span
+    {
+    width: calc(25px * var(--zoom-factor));
+    height: calc(3px * var(--zoom-factor));
+    background: #374151;
+    border-radius: calc(10px * var(--zoom-factor));
+    transition: all 0.3s linear;
+    position: relative;
+    transform-origin: 1px;
+    }
+
+.hamburger-button:hover span
+    {
+    background: #1f2937;
+    }
+
+.hamburger-dropdown
+    {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    min-width: 240px;
+    z-index: 1001;
+    margin-top: 0;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+    }
+
+.hamburger-item
+    {
+    padding: calc(2px * var(--zoom-factor)) calc(1rem * var(--zoom-factor));
+    border-bottom: 1px solid #f3f4f6;
+    }
+
+/* Remove padding for items that contain a button so the button can fill the width */
+.hamburger-item:has(.hamburger-button-item)
+    {
+    padding: 0;
+    }
+
+.hamburger-button-item
+    {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: #374151;
+    text-align: left;
+    cursor: pointer;
+    font-size: calc(14px * var(--zoom-factor));
+    transition: color 0.2s;
+    margin: 0;
+    padding: calc(0.5rem * var(--zoom-factor)) calc(1rem * var(--zoom-factor));
+    box-sizing: border-box;
+    }
+
+.hamburger-button-item:hover
+    {
+    color: #1f2937;
+    background: #f3f4f6;
+    }
+
+/* Disconnect button in hamburger menu */
+#disconnect-button.hamburger-button-item
+    {
+    background-color: #ef4444;
+    color: white;
+    border: 1px solid #dc2626;
+    width: 100%;
+    text-align: left;
+    font-size: calc(14px * var(--zoom-factor));
+    box-sizing: border-box;
+    padding: calc(0.5rem * var(--zoom-factor)) calc(1rem * var(--zoom-factor));
+    margin: 0;
+    border-radius: 0; /* Remove rounding to match other items */
+    }
+
+#disconnect-button.hamburger-button-item:hover
+    {
+    background-color: #dc2626;
+    color: white;
+    }
+
+/*---------------------------------------------------------------------------------------------*/
+/* Modal Styles */
+/*---------------------------------------------------------------------------------------------*/
+.modal
+    {
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    }
+
+.modal-content
+    {
+    background-color: white;
+    margin: auto;
+    padding: 0;
+    border-radius: 0.5rem;
+    width: 80%;
+    max-width: 900px;
+    min-width: 700px;
+    max-height: 85vh;
+    min-height: 500px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    resize: both;
+    overflow: auto;
+    position: relative;
+    border: 2px solid #e5e7eb;
+    }
+
+.modal-content::after
+    {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 0 25px 25px;
+    border-color: transparent transparent #6b7280 transparent;
+    cursor: se-resize;
+    transition: border-color 0.2s;
+    z-index: 1001;
+    }
+
+.modal-content:hover::after
+    {
+    border-color: transparent transparent #374151 transparent;
+    }
+
+.modal-header
+    {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+    }
+
+.modal-header h3
+    {
+    margin: 0;
+    font-size: calc(18px * var(--zoom-factor));
+    font-weight: 600;
+    color: #1f2937;
+    }
+
+.close-button
+    {
+    background: transparent;
+    border: none;
+    font-size: calc(24px * var(--zoom-factor));
+    cursor: pointer;
+    color: #6b7280;
+    padding: 0;
+    width: calc(30px * var(--zoom-factor));
+    height: calc(30px * var(--zoom-factor));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: calc(0.25rem * var(--zoom-factor));
+    transition: background-color 0.2s;
+    }
+
+.close-button:hover
+    {
+    background-color: #f3f4f6;
+    color: #374151;
+    }
+
+.modal-body
+    {
+    flex: 1;
+    padding: 1.5rem;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    }
+
+.filter-controls
+    {
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    border: 1px solid #e9ecef;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    }
+
+.filter-checkboxes
+    {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    }
+
+.enable-controls
+    {
+    display: flex;
+    gap: 8px;
+    }
+
+.enable-button
+    {
+    padding: 6px 12px;
+    border: 1px solid #d1d5db;
+    background: white;
+    color: #374151;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.2s, border-color 0.2s;
+    }
+
+.enable-button:hover
+    {
+    background-color: #f3f4f6;
+    border-color: #9ca3af;
+    }
+
+.enable-button:active
+    {
+    background-color: #e5e7eb;
+    }
+
+.filter-checkbox
+    {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+    cursor: pointer;
+    }
+
+.filter-checkbox input[type="checkbox"]
+    {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    }
+
+.filter-checkbox input[type="checkbox"]:disabled
+    {
+    cursor: not-allowed;
+    opacity: 0.5;
+    }
+
+.filter-checkbox:has(input[type="checkbox"]:disabled)
+    {
+    opacity: 0.6;
+    cursor: not-allowed;
+    }
+
+.modal-footer
+    {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #e5e7eb;
+    }
+
+.modal-footer-right
+    {
+    display: flex;
+    gap: 0.75rem;
+    }
+
+.save-button, .cancel-button
+    {
+    padding: calc(0.5rem * var(--zoom-factor)) calc(1rem * var(--zoom-factor));
+    border-radius: calc(0.375rem * var(--zoom-factor));
+    font-size: calc(14px * var(--zoom-factor));
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.2s;
+    }
+
+.save-button
+    {
+    background-color: #3b82f6;
+    color: white;
+    }
+
+.save-button:hover
+    {
+    background-color: #2563eb;
+    }
+
+.cancel-button
+    {
+    background-color: #6b7280;
+    color: white;
+    }
+
+.cancel-button:hover
+    {
+    background-color: #4b5563;
+    }
+
+/*---------------------------------------------------------------------------------------------*/
+/* League Order Table Styles */
+/*---------------------------------------------------------------------------------------------*/
+.league-list-container
+    {
+    flex: 1;
+    overflow: auto;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.375rem;
+    min-height: 200px;
+    position: relative;
+    max-height: 100%;
+    }
+
+.league-order-table
+    {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    table-layout: auto;
+    border-spacing: 0;
+    margin: 0;
+    padding: 0;
+    position: relative;
+    }
+
+/* Column widths for league order table */
+.league-order-table th:nth-child(1),
+.league-order-table td:nth-child(1)
+    {
+    min-width: 80px; /* Enabled column */
+    width: 10%;
+    text-align: center;
+    }
+
+.league-order-table th:nth-child(2),
+.league-order-table td:nth-child(2)
+    {
+    min-width: 120px; /* Sport column */
+    width: 25%;
+    }
+
+.league-order-table th:nth-child(3),
+.league-order-table td:nth-child(3)
+    {
+    min-width: 150px; /* League column */
+    width: 35%;
+    }
+
+.league-order-table th:nth-child(4),
+.league-order-table td:nth-child(4)
+    {
+    min-width: 150px; /* Subleague column */
+    width: 30%;
+    }
+
+.league-order-table thead
+    {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: #f9fafb;
+    }
+
+.league-order-table th
+    {
+    position: sticky;
+    top: 0;
+    background: #f9fafb;
+    padding: calc(1px * var(--zoom-factor)) calc(2px * var(--zoom-factor));
+    text-align: left;
+    font-weight: 600;
+    color: #374151;
+    border-bottom: 1px solid #e5e7eb;
+    z-index: 100;
+    font-size: calc(14px * var(--zoom-factor));
+    border-right: 1px solid #e5e7eb;
+    }
+
+.league-order-table th::after
+    {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: transparent;
+    cursor: col-resize;
+    transition: background-color 0.2s;
+    }
+
+.league-order-table th:hover::after
+    {
+    background: #3b82f6;
+    }
+
+.league-order-table th.resizing::after
+    {
+    background: #1d4ed8;
+    }
+
+.league-order-table td
+    {
+    padding: calc(1px * var(--zoom-factor)) calc(2px * var(--zoom-factor));
+    border-bottom: 1px solid #f3f4f6;
+    border-right: 1px solid #f3f4f6;
+    vertical-align: middle;
+    font-size: calc(14px * var(--zoom-factor));
+    }
+
+.league-order-table tr:hover
+    {
+    background-color: #f9fafb;
+    }
+
+.league-order-table tr.dragging
+    {
+    opacity: 0.5;
+    background-color: #e5e7eb;
+    }
+
+.league-order-table tr.drag-over
+    {
+    background-color: #dbeafe;
+    border: 2px dashed #3b82f6;
+    }
+
+.league-order-table tr
+    {
+    cursor: move;
+    user-select: none;
+    transition: background-color 0.2s;
+    }
+
+.sport-name
+    {
+    font-weight: 500;
+    color: #1f2937;
+    }
+
+.league-name
+    {
+    color: #374151;
+    }
+
+.subleague-name
+    {
+    color: #6b7280;
+    font-style: italic;
+    }
+
+/* Drag handle for reordering */
+.drag-handle
+    {
+    cursor: move;
+    color: #9ca3af;
+    margin-right: calc(0.5rem * var(--zoom-factor));
+    font-size: calc(19px * var(--zoom-factor));
+    }
+
+.drag-handle:hover
+    {
+    color: #6b7280;
+    }
+
+/* Toggle switch for league enabled/disabled */
+.toggle-switch
+    {
+    position: relative;
+    display: inline-block;
+    width: calc(40px * var(--zoom-factor));
+    height: calc(20px * var(--zoom-factor));
+    }
+
+.toggle-switch input
+    {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    }
+
+.toggle-slider
+    {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: calc(20px * var(--zoom-factor));
+    }
+
+.toggle-slider:before
+    {
+    position: absolute;
+    content: "";
+    height: calc(16px * var(--zoom-factor));
+    width: calc(16px * var(--zoom-factor));
+    left: calc(2px * var(--zoom-factor));
+    bottom: calc(2px * var(--zoom-factor));
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+    }
+
+input:checked + .toggle-slider
+    {
+    background-color: #3b82f6;
+    }
+
+input:checked + .toggle-slider:before
+    {
+    transform: translateX(calc(20px * var(--zoom-factor)));
+    }
+
+.toggle-switch:disabled .toggle-slider
+    {
+    background-color: #e5e7eb;
+    cursor: not-allowed;
+    }
+
+.toggle-switch:disabled .toggle-slider:before
+    {
+    background-color: #f3f4f6;
+    }
+
+/* Highlighted label for selected league below sport button */
+.selected-league-label
+    {
+    background-color: #3b82f6;
+    color: white;
+    border-radius: calc(0.375rem * var(--zoom-factor));
+    margin-top: calc(2px * var(--zoom-factor));
+    margin-bottom: calc(2px * var(--zoom-factor));
+    padding: calc(1px * var(--zoom-factor)) calc(8px * var(--zoom-factor));
+    font-size: calc(14px * var(--zoom-factor));
+    font-weight: 400;
+    text-align: center;
+    box-shadow: none;
+    display: block;
+    width: fit-content;
+    min-width: calc(40px * var(--zoom-factor));
+    max-width: 100%;
+    white-space: nowrap;
+    margin-left: auto;
+    margin-right: auto;
+    letter-spacing: 0;
+    transition: background-color 0.2s, color 0.2s;
+    }
+
+/* Highlighted banner for selected league above the table */
+.selected-league-banner
+    {
+    background-color: #3b82f6;
+    color: white;
+    border-radius: 999px;
+    margin: calc(0.5rem * var(--zoom-factor)) auto calc(1rem * var(--zoom-factor)) auto;
+    padding: calc(0.5rem * var(--zoom-factor)) calc(2.5rem * var(--zoom-factor));
+    font-size: calc(18px * var(--zoom-factor));
+    font-weight: 600;
+    text-align: center;
+    box-shadow: 0 calc(2px * var(--zoom-factor)) calc(8px * var(--zoom-factor)) rgba(59,130,246,0.08);
+    display: block;
+    width: fit-content;
+    min-width: calc(100px * var(--zoom-factor));
+    max-width: 90vw;
+    white-space: nowrap;
+    letter-spacing: 0.01em;
+    transition: background-color 0.2s, color 0.2s;
+    }
+
+.selected-view-chip
+    {
+    background-color: #3b82f6;
+    color: white;
+    border-radius: 999px;
+    padding: calc(2px * var(--zoom-factor)) calc(14px * var(--zoom-factor));
+    font-size: calc(16px * var(--zoom-factor));
+    font-weight: 600;
+    margin-left: calc(8px * var(--zoom-factor));
+    display: inline-flex;
+    align-items: center;
+    height: calc(28px * var(--zoom-factor));
+    min-width: calc(40px * var(--zoom-factor));
+    white-space: nowrap;
+    vertical-align: middle;
+    box-shadow: none;
+    }
+
+#period-dropdown,
+#display-type-dropdown
+    {
+    padding-top: calc(2px * var(--zoom-factor)) !important;
+    padding-bottom: calc(2px * var(--zoom-factor)) !important;
+    padding-left: calc(0.5rem * var(--zoom-factor));
+    padding-right: calc(0.5rem * var(--zoom-factor));
+    font-size: calc(15px * var(--zoom-factor));
+    height: calc(28px * var(--zoom-factor)) !important;
+    min-height: calc(28px * var(--zoom-factor)) !important;
+    line-height: 1.1;
+    }
+#period-dropdown
+    {
+    margin-right: calc(2px * var(--zoom-factor)) !important;
+    }
+#period-dropdown + #display-type-dropdown
+    {
+    margin-left: 0 !important;
+    }
+
+.page-header h2
+    {
+    margin-right: calc(0.75rem * var(--zoom-factor));
+    font-size: calc(20px * var(--zoom-factor));
+    }
+
+.sticky-spacer
+    {
+    height: 1px;
+    width: 100%;
+    background: transparent;
+    pointer-events: none;
+    }
+
+/*---------------------------------------------------------------------------------------------*/
+/* Sport Drag and Drop Styles */
+/*---------------------------------------------------------------------------------------------*/
+
+.sport-item.dragging
+    {
+    opacity: 0.7;
+    transform: rotate(2deg) scale(1.05);
+    z-index: 102;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+.sport-item.drag-over
+    {
+    border: 2px dashed #3b82f6;
+    background: #dbeafe;
+    border-radius: 4px;
+    margin: -2px;
+    }
+
+tr.score-active .score-cell .tennis-set.odds-medium strong,
+tr.score-active .score-cell .tennis-set.odds-old strong,
+tr.score-final .score-cell .tennis-set.odds-medium strong,
+tr.score-final .score-cell .tennis-set.odds-old strong
+    {
+    color: #000 !important;
+    }
+
+/* Sports Buttons Modal Styles */
+.sports-list-container
+    {
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.375rem;
+    }
+
+.sports-button-row
+    {
+    cursor: move;
+    transition: background-color 0.2s ease;
+    }
+
+.sports-button-row:hover
+    {
+    background-color: #f3f4f6;
+    }
+
+.sports-button-row.dragging
+    {
+    opacity: 0.5;
+    background-color: #e5e7eb;
+    }
+
+.sports-button-row.drag-over
+    {
+    background-color: #dbeafe;
+    border-top: 2px solid #3b82f6;
+    }
+
+.enabled-header
+    {
+    background-color: #000;
+    color: white;
+    text-align: center;
+    font-weight: 600;
+    }
+
+.delete-button
+    {
+    background-color: #dc2626;
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    transition: background-color 0.2s;
+    }
+
+.delete-button:hover
+    {
+    background-color: #b91c1c;
+    }
+
+.delete-button:active
+    {
+    background-color: #991b1b;
+    }
+
+/*---------------------------------------------------------------------------------------------*/
+/* Print Modal Styles */
+/*---------------------------------------------------------------------------------------------*/
+.print-columns-container
+    {
+    max-height: 400px;
+    overflow-y: auto;
+    }
+
+.print-column-row
+    {
+    transition: background-color 0.2s;
+    }
+
+.print-column-row:hover
+    {
+    background-color: #f3f4f6;
+    }
+
+.print-column-row.dragging
+    {
+    opacity: 0.5;
+    background-color: #e5e7eb;
+    }
+
+.print-column-row.drag-over
+    {
+    background-color: #dbeafe;
+    border-top: 2px solid #3b82f6;
+    }
+
+.column-name
+    {
+    font-weight: 500;
+    color: #374151;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    }
+
+.column-name .drag-handle
+    {
+    cursor: grab;
+    color: #6b7280;
+    font-size: 14px;
+    user-select: none;
+    }
+
+.column-name .drag-handle:hover
+    {
+    color: #374151;
+    }
+
+.column-name .drag-handle:active
+    {
+    cursor: grabbing;
+    }
+/* Bold team abbreviation and name when they are the winner */
+.team-abbr.winner,
+.team-name.winner
+    {
+    font-weight: bold;
+    }
+
+/* Ensure winner text color is not overridden by row styles in final games */
+tr.score-final .team-name.winner,
+tr.score-final .team-abbr.winner
+    {
+    color: white !important; /* Or black if you prefer on the red background */
+    }

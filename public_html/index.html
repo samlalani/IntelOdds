@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INTEL Odds</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-100">
+    <div class="odds-container">
+
+        <div class="page-header">
+            <h2 class="text-xl font-semibold">INTEL Odds</h2>
+            <select id="period-dropdown" class="px-4 py-2 border border-gray-300 rounded bg-white mr-2">
+                <option value="0">Game</option>
+                <option value="1">1st Half</option>
+                <option value="2">2nd Half</option>
+                <option value="3">1st Quarter</option>
+                <option value="4">2nd Quarter</option>
+                <option value="5">3rd Quarter</option>
+                <option value="6">4th Quarter</option>
+            </select>
+            <select id="display-type-dropdown" class="px-4 py-2 border border-gray-300 rounded bg-white mr-2">
+                <option value="0">DEFAULT</option>
+                <option value="1">SPREADS/TOTALS</option>
+                <option value="2">MONEYLINES/TOTALS</option>
+                <option value="3">SPREADS</option>
+                <option value="4">MONEYLINES</option>
+                <option value="5">TEAM_TOTALS</option>
+                <option value="6">TOTALS</option>
+                <option value="7">THREE_WAY</option>
+            </select>
+            <select id="odds-format-dropdown" class="px-4 py-2 border border-gray-300 rounded bg-white">
+                <option value="0">AMERICAN</option>
+                <option value="1">DECIMAL</option>
+                <option value="2">FRACTIONAL</option>
+                <option value="3">HONG KONG</option>
+                <option value="4">MALAYSIAN</option>
+                <option value="5">INDONESIAN</option>
+            </select>
+            <div class="spacer"></div>
+            <div id="status-area">
+                <div id="connection-status" class="status-message hidden"></div>
+                <div id="general-error" class="error-message hidden"></div>
+            </div>
+            <!-- Zoom Controls -->
+            <div class="zoom-controls">
+                <button id="zoom-out" class="zoom-button">−</button>
+                <span id="zoom-percentage">100%</span>
+                <button id="zoom-in" class="zoom-button">+</button>
+            </div>
+            <!-- Hamburger Menu -->
+            <div class="hamburger-menu">
+                <button id="hamburger-button" class="hamburger-button">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <div id="hamburger-dropdown" class="hamburger-dropdown hidden">
+                    <div class="hamburger-item">
+                        <label class="controls-group">
+                            <input type="checkbox" id="column-headers-checkbox" />
+                            <span>Column headers on top</span>
+                        </label>
+                    </div>
+                    <div class="hamburger-item">
+                        <button id="reset-order-button" class="hamburger-button-item">Reset Order</button>
+                    </div>
+                    <div class="hamburger-item">
+                        <button id="order-leagues-button" class="hamburger-button-item">Order Leagues</button>
+                    </div>
+                    <div class="hamburger-item">
+                        <button id="edit-sports-buttons-button" class="hamburger-button-item">Edit Sports Buttons</button>
+                    </div>
+
+                    <div class="hamburger-item">
+                        <button id="print-button" class="hamburger-button-item">Print</button>
+                    </div>
+
+                    <div class="hamburger-item">
+                        <button id="disconnect-button" class="hamburger-button-item hidden">Disconnect</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- League Order Modal -->
+        <div id="league-order-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Order Leagues</h3>
+                    <button id="close-modal" class="close-button">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div id="custom-display-input-container" class="custom-display-input-container hidden">
+                        <label for="custom-display-name-input" class="custom-display-label">Custom Display Name:</label>
+                        <input type="text" id="custom-display-name-input" class="custom-display-name-input" placeholder="Enter custom display name..." />
+                    </div>
+                    <div class="filter-controls">
+                        <div class="filter-checkboxes">
+                            <label class="filter-checkbox">
+                                <input type="checkbox" id="current-schedule-only-checkbox" />
+                                <span>Only in current schedule</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" id="order-by-date-checkbox" />
+                                <span>Order by date</span>
+                            </label>
+                        </div>
+                        <div class="enable-controls">
+                            <button id="enable-all-button" class="enable-button">Enable All</button>
+                            <button id="disable-all-button" class="enable-button">Disable All</button>
+                        </div>
+                    </div>
+                    <div class="league-list-container">
+                                            <table id="league-order-table" class="league-order-table">
+                        <thead>
+                            <tr>
+                                <th>Enabled</th>
+                                <th>Sport</th>
+                                <th>League</th>
+                                <th>Subleague</th>
+                            </tr>
+                        </thead>
+                        <tbody id="league-order-tbody">
+                            <!-- Will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="delete-custom-display" class="delete-button hidden">Delete</button>
+                    <div class="modal-footer-right">
+                        <button id="save-league-order" class="save-button">Save</button>
+                        <button id="cancel-league-order" class="cancel-button">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sports Buttons Modal -->
+        <div id="sports-buttons-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Edit Sports Buttons</h3>
+                    <button id="close-sports-modal" class="close-button">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="sports-list-container">
+                        <table id="sports-buttons-table" class="league-order-table">
+                            <thead>
+                                <tr>
+                                    <th class="enabled-header">Enabled</th>
+                                    <th>Sport</th>
+                                    <th>Delete</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sports-buttons-tbody">
+                                <!-- Will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="save-sports-buttons" class="save-button">Save</button>
+                    <button id="cancel-sports-buttons" class="cancel-button">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Print Modal -->
+        <div id="print-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Select Columns for Print</h3>
+                    <button id="close-print-modal" class="close-button">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="print-columns-container">
+                        <table id="print-columns-table" class="league-order-table">
+                            <thead>
+                                <tr>
+                                    <th class="enabled-header">Enabled</th>
+                                    <th>Column</th>
+                                </tr>
+                            </thead>
+                            <tbody id="print-columns-tbody">
+                                <!-- Will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="print-export-button" class="save-button">Print</button>
+                    <button id="cancel-print" class="cancel-button">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <nav id="sports-menu" class="hidden bg-white shadow-md rounded-lg p-4 mb-4">
+            <div class="sports-menu-header">
+                <div class="sports-menu-content">
+                    <!-- Menu will be populated by JavaScript -->
+                </div>
+                <button id="add-custom-display-button" class="add-custom-display-button" title="Add Custom Display">
+                    <span>+</span>
+                </button>
+            </div>
+        </nav>
+
+        <div id="login-section" class="mt-4">
+            <div class="login-form">
+                <input type="text" id="username" placeholder="Username" value="testuser">
+                <input type="password" id="password" placeholder="Password" value="password123">
+                <button id="connect-button" class="px-8 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded">Connect</button>
+            </div>
+        </div>
+
+        <div id="data-section" class="hidden mt-6">
+            <div id="odds-table-target"></div>
+        </div>
+
+        <!-- Sportsbook Context Menu -->
+        <div id="sportsbook-context-menu" class="sportsbook-context-menu">
+            <div class="sportsbook-context-menu-item" data-action="highlight-all-sports">Highlight all sports</div>
+            <div class="sportsbook-context-menu-item" data-action="highlight-this-sport">Highlight this sport</div>
+            <div class="sportsbook-context-menu-item" data-action="highlight-this-table">Highlight this table</div>
+            <div class="sportsbook-context-menu-item" data-action="unhighlight-all-sports">UNHighlight all sports</div>
+            <div class="sportsbook-context-menu-item" data-action="unhighlight-this-sport">UNHighlight this sport</div>
+            <div class="sportsbook-context-menu-item" data-action="unhighlight-this-table">UNHighlight this table</div>
+        </div>
+
+    </div>
+
+    <!-- Main entry point for the application -->
+    <script type="module" src="main.js"></script>
+</body>
+</html>
