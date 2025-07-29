@@ -44,9 +44,18 @@ export default class TableView
         {
         this.generateOddsTable ();
         if (this.state.fullLinesRawData && this.state.fullLinesRawData.length > 0)
-            {
             this.updateOddsFromLinesRaw (this.state.fullLinesRawData);
-            }
+        
+        // Reset scrollbar to top when switching displays
+        let oddsContainer = document.getElementById ('odds-container');
+        if (oddsContainer)
+            oddsContainer.scrollTop = 0;
+        oddsContainer = document.getElementById ('data-section');
+        if (oddsContainer)
+            oddsContainer.scrollTop = 0;
+        oddsContainer = document.getElementById ('odds-table-target');
+        if (oddsContainer)
+            oddsContainer.scrollTop = 0;
         }
     //-------------------------------------------------------------------------------------------------
     /**
@@ -68,16 +77,15 @@ export default class TableView
             let sortedGroups;
             const leagueOrderObj = this.storageService.loadLeagueOrder();
 
-            if (this.state.currentViewType === 'SPORT' || this.state.currentViewType === 'CUSTOM_DISPLAY')
+            if (this.state.currentViewType === 'SPORT' || this.state.currentViewType === 'LEAGUE' || this.state.currentViewType === 'CUSTOM_DISPLAY')
                 {
                 let sportLeagueOrder = [];
-                if (this.state.currentViewType === 'SPORT')
+                if (this.state.currentViewType === 'SPORT' || this.state.currentViewType === 'LEAGUE')
                     {
-                    sportLeagueOrder = leagueOrderObj[this.state.currentViewId] || [];
+                    sportLeagueOrder = leagueOrderObj [this.state.currentViewId] || [];
                     }
                 else // CUSTOM_DISPLAY
                     {
-                    // EXACT CHANGE: Use this.leagueOrderModal instead of this.app.leagueOrderModal
                     const customDisplay = this.leagueOrderModal.customDisplays.find (d => d.id === this.state.currentViewId);
                     if (customDisplay && customDisplay.leagues)
                         sportLeagueOrder = customDisplay.leagues.map(id => ({ id, enabled: true }));
@@ -89,35 +97,86 @@ export default class TableView
                 if (isToday || !orderByDate)
                     {
                     const orderedGroups = [];
-                    sportLeagueOrder.forEach (leagueData =>
+                    if (sportLeagueOrder.length > 0)
                         {
-                        const leagueId = leagueData.id;
-                        const enabled = leagueData.enabled;
-                        if (!enabled) return;
+                        sportLeagueOrder.forEach (leagueData =>
+                            {
+                            const leagueId = leagueData.id;
+                            const enabled = leagueData.enabled;
+                            if (!enabled) return;
+                            const matchingGroups = groups.filter (group => group.league_id === leagueId);
+                            if (matchingGroups.length > 0)
+                                {
+                                orderedGroups.push (...matchingGroups);
+                                }
+                            });
+                        sortedGroups = [...orderedGroups];
+                        }
+                    else
+                        {
+                        // If no league order exists, use the fallback sorting
+                        sortedGroups = [...groups].sort((a, b) =>
+                            {
+                            if (!isToday)
+                                {
+                                // Sort by date first
+                                const dateA = a['group-date'] || a['category-date'] || '';
+                                const dateB = b['group-date'] || b['category-date'] || '';
+                                const dateComparison = dateA.localeCompare(dateB);
+                                if (dateComparison !== 0)
+                                    return dateComparison;
+                                }
 
-                        const matchingGroups = groups.filter (group => group.league_id === leagueId);
-                        if (matchingGroups.length > 0)
-                            orderedGroups.push (...matchingGroups);
-                        });
-                    
-                    const remainingGroups = groups.filter(group => !orderedGroups.includes(group));
-                    sortedGroups = [...orderedGroups, ...remainingGroups];
+                            // If dates are the same, sort by main_league_id
+                            const leagueA = this.state.leaguesData.data.find(l => l.id === a.league_id);
+                            const leagueB = this.state.leaguesData.data.find(l => l.id === b.league_id);
+                            const mainLeagueA = leagueA ? (leagueA.main_league_id || leagueA.id) : a.league_id;
+                            const mainLeagueB = leagueB ? (leagueB.main_league_id || leagueB.id) : b.league_id;
+                            
+                            if (mainLeagueA !== mainLeagueB)
+                                return mainLeagueA - mainLeagueB;
+                            
+                            // If main_league_id is the same, sort by is_series_price (false before true)
+                            const aIsSeriesPrice = a.header && a.header.toLowerCase().includes('series price');
+                            const bIsSeriesPrice = b.header && b.header.toLowerCase().includes('series price');
+                            
+                            if (aIsSeriesPrice !== bIsSeriesPrice)
+                                return aIsSeriesPrice ? 1 : -1; // false comes before true
+                            
+                            // If series price status is the same, sort by league_id
+                            return a.league_id - b.league_id;
+                            });
+                        }
                     }
                 else // Sort by date first, then league order
                     {
-                    sortedGroups = [...groups].sort((a, b) =>
+                    // Sort by date first, then main_league_id, then is_series_price (false before true), then league_id
+                    sortedGroups = [...groups].sort ((a, b) =>
                         {
+                        // Sort by date first
                         const dateA = a['group-date'] || a['category-date'] || '';
                         const dateB = b['group-date'] || b['category-date'] || '';
                         const dateComparison = dateA.localeCompare(dateB);
-                        if (dateComparison !== 0) return dateComparison;
+                        if (dateComparison !== 0)
+                            return dateComparison;
 
-                        const leagueAIndex = sportLeagueOrder.findIndex(l => l.id === a.league_id);
-                        const leagueBIndex = sportLeagueOrder.findIndex(l => l.id === b.league_id);
+                        // If dates are the same, sort by main_league_id
+                        const leagueA = this.state.leaguesData.data.find(l => l.id === a.league_id);
+                        const leagueB = this.state.leaguesData.data.find(l => l.id === b.league_id);
+                        const mainLeagueA = leagueA ? (leagueA.main_league_id || leagueA.id) : a.league_id;
+                        const mainLeagueB = leagueB ? (leagueB.main_league_id || leagueB.id) : b.league_id;
 
-                        if (leagueAIndex !== -1 && leagueBIndex !== -1) return leagueAIndex - leagueBIndex;
-                        if (leagueAIndex !== -1) return -1;
-                        if (leagueBIndex !== -1) return 1;
+                        if (mainLeagueA !== mainLeagueB)
+                            return mainLeagueA - mainLeagueB;
+
+                        // If main_league_id is the same, sort by is_series_price (false before true)
+                        const aIsSeriesPrice = a.header && a.header.toLowerCase().includes ('series price');
+                        const bIsSeriesPrice = b.header && b.header.toLowerCase().includes ('series price');
+
+                        if (aIsSeriesPrice !== bIsSeriesPrice)
+                            return aIsSeriesPrice ? 1 : -1; // false comes before true
+
+                        // If series price status is the same, sort by league_id
                         return a.league_id - b.league_id;
                         });
                     }
@@ -214,7 +273,7 @@ export default class TableView
         headers.forEach (headerText =>
             {
             const isSportsbook = !baseHeaders.includes (headerText);
-            const className = `px-1 py-1 text-xs font-semibold text-gray-600 uppercase tracking-wider ${isSportsbook ? 'cursor-move' : ''}`;
+            const className = `px-1 text-xs font-semibold text-gray-600 uppercase tracking-wider ${isSportsbook ? 'cursor-move' : ''}`;
             const dataAttr = isSportsbook ? `data-sportsbook="${headerText}"` : '';
             const displayText = this.state.sportsbookIdToAbbr[headerText] || headerText;
             headerRowContent += `<th scope="col" class="${className}" ${dataAttr}>${displayText}</th>`;
@@ -260,7 +319,7 @@ export default class TableView
         let rowHtml = `<tr class="${rowClass}" data-rotation="${game.rotation_number}" data-date="${game.date}" data-group="${group.category_id}" data-event-id="${game.event_id}">`;
 
         // Time Column
-        rowHtml += `<td class="px-1 py-1 text-sm text-gray-700 time-column">
+        rowHtml += `<td class="px-1 text-sm text-gray-700 time-column">
             <div class="time-display">
                 <div class="time-row">${game.time}</div>
                 <div class="time-icons">
@@ -273,7 +332,7 @@ export default class TableView
         </td>`;
 
         // ROT Column
-        rowHtml += `<td class="px-1 py-1 text-sm text-gray-700">
+        rowHtml += `<td class="px-1 text-sm text-gray-700">
             <div class="rotation-numbers">
                 <span>${game.rotation_number}</span>
                 <span>${parseInt (game.rotation_number) + 1}</span>
@@ -281,7 +340,7 @@ export default class TableView
         </td>`;
 
         // EXACT CHANGE: Added winner class logic to team names.
-        rowHtml += `<td class="px-1 py-1 text-sm text-gray-900 matchup-cell" onclick="handleTeamNameClick('${game.event_id}', '${game.date || ''}')" style="cursor: pointer;">
+        rowHtml += `<td class="px-1 text-sm text-gray-900 matchup-cell" onclick="handleTeamNameClick('${game.event_id}', '${game.date || ''}')" style="cursor: pointer;">
             <div>
                 <span class="team-name font-medium">${
                         game.awayPitcher
@@ -372,7 +431,7 @@ export default class TableView
             {
             const awayId = `${game.event_id}-0-${sbId}-${this.state.selectedPeriodId}-${this.state.selectedDisplayType}`;
             const homeId = `${game.event_id}-1-${sbId}-${this.state.selectedPeriodId}-${this.state.selectedDisplayType}`;
-            rowHtml += `<td class="px-1 py-1 text-sm text-gray-600 odds-cell" data-sportsbook="${sbId}">
+            rowHtml += `<td class="px-1 text-sm text-gray-600 odds-cell" data-sportsbook="${sbId}">
                 <div class="sportsbook-container">
                     <span class="odds-value" id="${awayId}">-</span>
                     <span class="odds-value" id="${homeId}">-</span>

@@ -207,6 +207,85 @@ export default class StorageService
         this.set('sportsVisibility', visibility);
         }
     //-------------------------------------------------------------------------------------------------
+    // New methods for type/id structure
+    loadItemOrder ()
+        {
+        return this.get ('itemOrder') || [];
+        }
+    //-------------------------------------------------------------------------------------------------
+    saveItemOrder (order)
+        {
+        this.set ('itemOrder', order);
+        }
+    //-------------------------------------------------------------------------------------------------
+    loadItemsVisibility ()
+        {
+        return this.get ('itemsVisibility') || {};
+        }
+    //-------------------------------------------------------------------------------------------------
+    saveItemsVisibility (visibility)
+        {
+        this.set ('itemsVisibility', visibility);
+        }
+    //-------------------------------------------------------------------------------------------------
+    loadLeagueButtons ()
+        {
+        return this.get ('leagueButtons') || [];
+        }
+    //-------------------------------------------------------------------------------------------------
+    saveLeagueButtons (leagueButtons)
+        {
+        this.set ('leagueButtons', leagueButtons);
+        }
+    //-------------------------------------------------------------------------------------------------
+    // Migration methods to convert old format to new format
+    migrateSportOrderToItemOrder ()
+        {
+        const oldSportOrder = this.get ('sportOrder');
+        const oldSportsVisibility = this.get ('sportsVisibility');
+        
+        if (oldSportOrder && oldSportOrder.length > 0)
+            {
+            // Convert old sport IDs to new type:id format
+            const newItemOrder = oldSportOrder.map (sportId =>
+                {
+                if (sportId === 0)
+                    {
+                    return 'CUSTOM_DISPLAY:TODAY'; // Convert old TODAY sport to new format
+                    }
+                else
+                    {
+                    return `SPORT:${sportId}`;
+                    }
+                });
+            
+            // Convert old visibility to new format
+            const newItemsVisibility = {};
+            if (oldSportsVisibility)
+                {
+                Object.keys (oldSportsVisibility).forEach (sportId =>
+                    {
+                    if (sportId === '0')
+                        {
+                        newItemsVisibility['CUSTOM_DISPLAY:TODAY'] = oldSportsVisibility[sportId];
+                        }
+                    else
+                        {
+                        newItemsVisibility[`SPORT:${sportId}`] = oldSportsVisibility[sportId];
+                        }
+                    });
+                }
+            
+            // Save new format and remove old format
+            this.set ('itemOrder', newItemOrder);
+            this.set ('itemsVisibility', newItemsVisibility);
+            this.remove ('sportOrder');
+            this.remove ('sportsVisibility');
+            
+            console.log ('Migrated sport order and visibility to new type:id format');
+            }
+        }
+    //-------------------------------------------------------------------------------------------------
     loadLeagueOrder ()
         {
         const raw = localStorage.getItem('leagueOrder');

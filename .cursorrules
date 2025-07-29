@@ -1,0 +1,45 @@
+# Cursor Rules for IntelOdds Project
+
+## Windows Development Environment
+- This project runs on Windows 11 - use Windows-compatible commands
+- Use `dir` instead of `ls` for directory listing
+- Use `cd` for directory navigation
+- Use `;` to separate commands instead of `&&` for command chaining
+- Use PowerShell commands: `Get-ChildItem`, `Set-Location`, etc.
+- Use Windows path separators: `\` instead of `/`
+- Use `copy` and `move` instead of `cp` and `mv`
+- Use `del` or `Remove-Item` instead of `rm`
+
+## JavaScript/HTML/CSS Conventions
+- Use camelCase for variables and functions
+- Use PascalCase for classes and components
+- Use UPPER_SNAKE_CASE for constants
+- Use 2 spaces for indentation
+- Use single quotes for strings when possible
+- Use semicolons at the end of statements
+- Use meaningful variable and function names
+
+## Project-Specific Rules
+- Follow the existing code structure and patterns in the IntelOdds project
+- Maintain the existing UI/UX patterns
+- Preserve the existing data visualization patterns
+- Keep the existing event handling patterns
+- Maintain the existing file organization structure
+
+## File Organization
+- Keep related functionality together in appropriate directories
+- Use descriptive file and folder names
+- Add comments for complex logic
+- Maintain the existing public_html structure
+
+## Error Handling
+- Always include try-catch blocks for error-prone operations
+- Log errors to console with descriptive messages
+- Provide user-friendly error messages when appropriate
+- Handle network errors gracefully
+
+## UI/UX Guidelines
+- Maintain responsive design principles
+- Ensure accessibility standards are met
+- Use consistent styling patterns
+- Follow modern web development best practices 

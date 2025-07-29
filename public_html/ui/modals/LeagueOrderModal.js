@@ -120,6 +120,9 @@ export default class LeagueOrderModal
                     }
                 });
             }
+        
+        // Initialize drag-and-drop for league reordering
+        this.initializeLeagueDragAndDrop();
         }
     //-------------------------------------------------------------------------------------------------
     loadCustomDisplays()
@@ -763,6 +766,7 @@ export default class LeagueOrderModal
             {
             const row = document.createElement ('tr');
             row.dataset.leagueId = item.leagueId;
+            row.setAttribute ('draggable', 'true');
 
             // Enabled checkbox
             const enabledCell = document.createElement ('td');
@@ -802,5 +806,90 @@ export default class LeagueOrderModal
             this.dom.orderLeaguesButton.textContent = `Edit ${this.state.currentViewName}`;
         else
             this.dom.orderLeaguesButton.textContent = 'Order Leagues';
+        }
+    
+    //-------------------------------------------------------------------------------------------------
+    /**
+     * Initializes drag-and-drop functionality for league reordering in the modal.
+     */
+    //-------------------------------------------------------------------------------------------------
+    initializeLeagueDragAndDrop ()
+        {
+        if (!this.dom.tbody) return;
+        
+        this.dom.tbody.addEventListener ('dragstart', this.handleLeagueDragStart.bind (this));
+        this.dom.tbody.addEventListener ('dragover', this.handleLeagueDragOver.bind (this));
+        this.dom.tbody.addEventListener ('drop', this.handleLeagueDrop.bind (this));
+        this.dom.tbody.addEventListener ('dragend', this.handleLeagueDragEnd.bind (this));
+        }
+    
+    //-------------------------------------------------------------------------------------------------
+    handleLeagueDragStart (e)
+        {
+        const row = e.target.closest ('tr');
+        if (!row || !row.dataset.leagueId) return;
+        
+        this.draggedRow = row;
+        e.dataTransfer.setData ('text/plain', row.dataset.leagueId);
+        row.classList.add ('dragging');
+        }
+    
+    //-------------------------------------------------------------------------------------------------
+    handleLeagueDragOver (e)
+        {
+        e.preventDefault ();
+        e.dataTransfer.dropEffect = 'move';
+        
+        // Remove drag-over class from all rows
+        this.dom.tbody.querySelectorAll ('tr').forEach (row => row.classList.remove ('drag-over'));
+        
+        // Add drag-over class to the target row
+        const targetRow = e.target.closest ('tr');
+        if (targetRow && targetRow.dataset.leagueId && targetRow !== this.draggedRow)
+            {
+            targetRow.classList.add ('drag-over');
+            }
+        }
+    
+    //-------------------------------------------------------------------------------------------------
+    handleLeagueDrop (e)
+        {
+        e.preventDefault ();
+        
+        // Remove drag-over class from all rows
+        this.dom.tbody.querySelectorAll ('tr').forEach (row => row.classList.remove ('drag-over'));
+        
+        const targetRow = e.target.closest ('tr');
+        if (!targetRow || !targetRow.dataset.leagueId || targetRow === this.draggedRow) return;
+
+        const draggedId = parseInt (this.draggedRow.dataset.leagueId, 10);
+        const targetId = parseInt (targetRow.dataset.leagueId, 10);
+
+        // Find the indices in the leagueOrderData array
+        const draggedIndex = this.leagueOrderData.findIndex (item => item.leagueId === draggedId);
+        const targetIndex = this.leagueOrderData.findIndex (item => item.leagueId === targetId);
+
+        if (draggedIndex > -1 && targetIndex > -1)
+            {
+            // Move the item in the array
+            const [movedItem] = this.leagueOrderData.splice (draggedIndex, 1);
+            this.leagueOrderData.splice (targetIndex, 0, movedItem);
+
+            // Re-render the table to reflect the new order
+            this.renderTable ();
+            }
+        }
+    
+    //-------------------------------------------------------------------------------------------------
+    handleLeagueDragEnd (e)
+        {
+        // Remove drag-over class from all rows
+        this.dom.tbody.querySelectorAll ('tr').forEach (row => row.classList.remove ('drag-over'));
+        
+        if (this.draggedRow)
+            {
+            this.draggedRow.classList.remove ('dragging');
+            this.draggedRow = null;
+            }
         }
     }

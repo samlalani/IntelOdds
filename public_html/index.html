@@ -154,7 +154,6 @@
                                 <tr>
                                     <th class="enabled-header">Enabled</th>
                                     <th>Sport</th>
-                                    <th>Delete</th>
                                 </tr>
                             </thead>
                             <tbody id="sports-buttons-tbody">
@@ -166,6 +165,36 @@
                 <div class="modal-footer">
                     <button id="save-sports-buttons" class="save-button">Save</button>
                     <button id="cancel-sports-buttons" class="cancel-button">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add League Buttons Modal -->
+        <div id="add-league-buttons-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Add League Buttons</h3>
+                    <button id="close-add-league-modal" class="close-button">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="leagues-list-container">
+                        <table id="add-league-buttons-table" class="league-order-table">
+                            <thead>
+                                <tr>
+                                    <th class="enabled-header">Enabled</th>
+                                    <th>League</th>
+                                    <th>Name to use</th>
+                                </tr>
+                            </thead>
+                            <tbody id="add-league-buttons-tbody">
+                                <!-- Will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="save-add-league-buttons" class="save-button">Save</button>
+                    <button id="cancel-add-league-buttons" class="cancel-button">Cancel</button>
                 </div>
             </div>
         </div>

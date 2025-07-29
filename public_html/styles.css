@@ -12,6 +12,67 @@
     --footer-height: 60px;  /* Approximate height of footer content */
     --zoom-factor: 1;
     }
+
+/*---------------------------------------------------------------------------------------------*/
+/* Cursor Rules for All Projects */
+/*---------------------------------------------------------------------------------------------*/
+/*
+# Cursor Rules for All Projects
+
+## Windows Environment Rules
+- This is a Windows 11 environment - DO NOT use Linux commands
+- DO NOT use "&&" to chain commands - use separate commands or PowerShell syntax
+- Use Windows-compatible commands and paths
+- Use PowerShell syntax when appropriate
+
+## Code Style
+- Always use Whitesmiths brace placement style:
+  ```java
+  if (condition)
+      {
+      // code
+      }
+  ```
+  NOT:
+  ```java
+  if (condition) {
+      // code
+  }
+  ```
+
+## Java Conventions
+- Use camelCase for variables and methods
+- Use PascalCase for classes
+- Use UPPER_SNAKE_CASE for constants
+- Always use semicolons at the end of statements
+- Use 4 spaces for indentation (not tabs)
+- Always add a space before left parentheses in:
+  - Control structures: `if (condition)`, `for (int i = 0)`, `while (condition)`
+  - Method calls: `test (param)`, `System.out.println (message)`
+  - Constructor calls: `new Date ()`
+- Do NOT add space before left parentheses in:
+  - Method declarations: `public void test() {}`
+  - Lambda expressions: `param -> {}`
+- Use Whitesmiths brace placement style for all blocks (if, for, while, function, etc.)
+
+## Project-Specific Rules
+- Follow the existing code structure and patterns in each project
+- Maintain the existing data parsing patterns
+- Preserve the existing file processing patterns
+- Keep the existing API communication patterns
+- Maintain the existing package naming conventions
+
+## File Organization
+- Keep related functionality together
+- Use descriptive method and variable names
+- Add comments for complex logic
+- Maintain the existing file structure
+
+## Error Handling
+- Always include try-catch blocks for error-prone operations
+- Log errors to console with descriptive messages
+- Provide user-friendly error messages when appropriate
+*/
 /*---------------------------------------------------------------------------------------------*/
 /* Zoom Controls Styles */
 /*---------------------------------------------------------------------------------------------*/
@@ -184,7 +245,7 @@ table
 /*---------------------------------------------------------------------------------------------*/
 th, td
     {
-    padding: calc(0.25rem * var(--zoom-factor));
+    padding: 0 calc(0.25rem * var(--zoom-factor));
     text-align: left;
     border-bottom: 1px solid #e5e7eb;
     vertical-align: middle;
@@ -199,6 +260,14 @@ th
     top: 0;
     text-align: center;
     z-index: 10; /* z-index for headers that only scroll top */
+    }
+
+/* Remove padding from header cells to make them shorter */
+thead th,
+.sticky-header th
+    {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
     }
 
 /* Column 1: Time */
@@ -311,7 +380,7 @@ th
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
-    height: calc(28px * var(--zoom-factor)) !important;
+    height: calc(20px * var(--zoom-factor)) !important;
     line-height: calc(20px * var(--zoom-factor)) !important;
     padding-top: calc(2px * var(--zoom-factor)) !important;
     padding-bottom: calc(2px * var(--zoom-factor)) !important;
@@ -1021,6 +1090,14 @@ tr[data-rotation].drag-over
     {
     content: "⭐ ";
     margin-right: 4px;
+    }
+
+/* Remove star for TODAY and TOMORROW since they are special */
+.custom-display-item .sport-link[data-sport-id="TODAY"]::before,
+.custom-display-item .sport-link[data-sport-id="TOMORROW"]::before
+    {
+    content: "";
+    margin-right: 0;
     }
 
 .delete-custom-display-button
@@ -2473,4 +2550,66 @@ tr.score-final .team-name.winner,
 tr.score-final .team-abbr.winner
     {
     color: white !important; /* Or black if you prefer on the red background */
+    }
+
+/* Custom name input for Add League Buttons modal */
+.custom-name-input
+    {
+    width: 100%;
+    padding: 4px 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    }
+
+.custom-name-input:focus
+    {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba (0, 123, 255, 0.25);
+    }
+
+/* Add League Button */
+.add-league-button
+    {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    }
+
+.add-league-button:hover
+    {
+    background-color: #218838;
+    }
+
+/* Remove Button */
+.remove-button
+    {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    }
+
+.remove-button:hover
+    {
+    background-color: #c82333;
+    }
+
+/* League item styling */
+.league-item .sport-link
+    {
+    color: #495057;
+    }
+
+.league-item .sport-link:hover
+    {
+    color: #007bff;
     }

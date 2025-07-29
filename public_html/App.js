@@ -9,6 +9,7 @@ import ContextMenu        from './features/ContextMenu.js';
 import ZoomControl        from './features/ZoomControl.js';
 import LeagueOrderModal   from './ui/modals/LeagueOrderModal.js';
 import SportsButtonsModal from './ui/modals/SportsButtonsModal.js';
+import AddLeagueButtonsModal from './ui/modals/AddLeagueButtonsModal.js';
 import PrintModal         from './ui/modals/PrintModal.js';
 
 /**
@@ -69,6 +70,7 @@ export default class App
         // --- Instantiate Modals first, as other components may depend on them ---
         this.leagueOrderModal   = new LeagueOrderModal (this);
         this.sportsButtonsModal = new SportsButtonsModal (this);
+        this.addLeagueButtonsModal = new AddLeagueButtonsModal (this);
         this.printModal         = new PrintModal (this);
 
         // --- Instantiate remaining UI components and Feature Managers ---
@@ -82,7 +84,8 @@ export default class App
         this.menuView = new MenuView (
             this.handleMenuSelection.bind (this),
             this.state,
-            this.leagueOrderModal // Pass modal instance
+            this.leagueOrderModal, // Pass modal instance
+            this.storageService // Pass storage service
             );
         this.hamburgerMenu = new HamburgerMenu(); // Initialize the hamburger menu
         this.dndManager = new DragAndDropManager (
@@ -117,6 +120,9 @@ export default class App
     //-------------------------------------------------------------------------------------------------
     loadInitialState ()
         {
+        // Migrate old sport order/visibility to new type/id format
+        this.storageService.migrateSportOrderToItemOrder ();
+        
         // Load user credentials and settings
         const settings = this.storageService.loadSettings ();
         if (settings.username) this.dom.usernameInput.value = settings.username;
@@ -176,6 +182,13 @@ export default class App
             this.redrawAll ();
             });
         this.dom.resetOrderButton.addEventListener ('click', () => this.resetOrder ());
+
+        // Add event listener for Edit Sports Buttons button
+        const editSportsButtonsButton = document.getElementById ('edit-sports-buttons-button');
+        if (editSportsButtonsButton)
+            {
+            editSportsButtonsButton.addEventListener ('click', () => this.sportsButtonsModal.open ());
+            }
 
         window.addEventListener ('beforeunload', () => this.apiService.disconnect ());
         }
@@ -274,7 +287,7 @@ export default class App
         if (lastView && lastView.type && lastView.id)
             this.handleMenuSelection (lastView.type, lastView.id, lastView.name);
         else
-            this.handleMenuSelection ('SPORT', 0, 'TODAY'); // Default
+            this.handleMenuSelection ('CUSTOM_DISPLAY', 'TODAY', 'TODAY'); // Default to TODAY
         }
     //-------------------------------------------------------------------------------------------------
     /**
@@ -299,11 +312,39 @@ export default class App
                 {
                 type:        'SET_VIEW',
                 viewType:    this.state.currentViewType,
-                id:          this.state.currentViewId,
                 displayType: key === 'displayType' ? value : this.state.selectedDisplayType,
                 periodId:    key === 'periodId'    ? value : this.state.selectedPeriodId,
                 oddsFormat:  key === 'oddsFormat'  ? value : this.state.selectedOddsFormat,
                 };
+
+            // Handle TODAY and TOMORROW as CUSTOM_DISPLAY with date offsets
+            if (this.state.currentViewName === 'TODAY')
+                {
+                command.start_date_offset = 0;
+                command.end_date_offset = 0;
+                }
+            else if (this.state.currentViewName === 'TOMORROW')
+                {
+                command.start_date_offset = 1;
+                command.end_date_offset = 1;
+                }
+            else if (this.state.currentViewType === 'CUSTOM_DISPLAY')
+                {
+                // Only add id and leagues for regular custom displays (not TODAY/TOMORROW)
+                if (this.state.currentViewId !== 'TODAY' && this.state.currentViewId !== 'TOMORROW')
+                    {
+                    command.id = parseInt (this.state.currentViewId.substring (1));
+                    const customDisplay = this.leagueOrderModal.customDisplays.find (d => d.id === this.state.currentViewId);
+                    if (customDisplay)
+                        command.leagues = customDisplay.leagues;
+                    }
+                }
+            else
+                {
+                // For SPORT and LEAGUE, add the id
+                command.id = parseInt (this.state.currentViewId, 10);
+                }
+
             console.log ('SET_VIEW command:', command);
             this.apiService.send (command);
             }
@@ -333,19 +374,37 @@ export default class App
                 {
                 type:        'SET_VIEW',
                 viewType:    type,
-                id:          (type === 'CUSTOM_DISPLAY'
-                              ? parseInt (id.substring (1))
-                              : parseInt (id, 10)),
                 displayType: this.state.selectedDisplayType,
                 periodId:    this.state.selectedPeriodId,
                 oddsFormat:  this.state.selectedOddsFormat,
                 };
 
-            if (type === 'CUSTOM_DISPLAY')
+            // Handle TODAY and TOMORROW as CUSTOM_DISPLAY with date offsets
+            if (name === 'TODAY')
                 {
-                const customDisplay = this.leagueOrderModal.customDisplays.find (d => d.id === id);
-                if (customDisplay)
-                    command.leagues = customDisplay.leagues;
+                command.start_date_offset = 0;
+                command.end_date_offset = 0;
+                }
+            else if (name === 'TOMORROW')
+                {
+                command.start_date_offset = 1;
+                command.end_date_offset = 1;
+                }
+            else if (type === 'CUSTOM_DISPLAY')
+                {
+                // Only add id and leagues for regular custom displays (not TODAY/TOMORROW)
+                if (id !== 'TODAY' && id !== 'TOMORROW')
+                    {
+                    command.id = parseInt (id.substring (1));
+                    const customDisplay = this.leagueOrderModal.customDisplays.find (d => d.id === id);
+                    if (customDisplay)
+                        command.leagues = customDisplay.leagues;
+                    }
+                }
+            else
+                {
+                // For SPORT and LEAGUE, add the id
+                command.id = parseInt (id, 10);
                 }
 
             this.apiService.send (command);

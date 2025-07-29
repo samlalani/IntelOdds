@@ -5,11 +5,12 @@
  */
 export default class MenuView
     {
-    constructor (selectionHandler, state, leagueOrderModal)
+    constructor (selectionHandler, state, leagueOrderModal, storageService)
         {
         this.selectionHandler = selectionHandler; // App's handleMenuSelection method
         this.state = state;
         this.leagueOrderModal = leagueOrderModal; // Reference to the modal instance
+        this.storageService = storageService; // Reference to the storage service
 
         this.dom = {
             sportsMenu: document.getElementById ('sports-menu'),
@@ -31,25 +32,103 @@ export default class MenuView
         this.dom.sportsMenu.classList.remove ('hidden');
         let menuHtml = '';
 
-        // This is a simplified rendering. A full implementation would
-        // respect sport order and visibility from localStorage.
-        const allItems =
-            [
-            ...this.state.menuData.data,
-            ...this.leagueOrderModal.customDisplays.map(d => ({...d, type: 'custom'}))
-            ];
-            
+        // Load item order and visibility
+        const itemOrder = this.storageService.loadItemOrder ();
+        const itemsVisibility = this.storageService.loadItemsVisibility ();
+
+        // Create all available items with type/id structure
+        const allItems = [];
+        
+        // Add TODAY and TOMORROW as CUSTOM_DISPLAY items
+        allItems.push ({ id: 'TODAY', name: 'TODAY', type: 'CUSTOM_DISPLAY' });
+        allItems.push ({ id: 'TOMORROW', name: 'TOMORROW', type: 'CUSTOM_DISPLAY' });
+        
+        // Add sports (filter out old TODAY sport with ID 0)
+        this.state.menuData.data.filter (sport => sport.id !== 0).forEach (sport =>
+            {
+            allItems.push ({ id: sport.id.toString (), name: sport.name, type: 'SPORT', sport: sport });
+            });
+        
+        // Add custom displays
+        this.leagueOrderModal.customDisplays.forEach (display =>
+            {
+            allItems.push ({ id: display.id, name: display.name, type: 'CUSTOM_DISPLAY', display: display });
+            });
+
+        // Add league buttons from sports buttons data
+        if (this.app && this.app.sportsButtonsModal && this.app.sportsButtonsModal.sportsButtonsData)
+            {
+            this.app.sportsButtonsModal.sportsButtonsData
+                .filter (item => item.type === 'LEAGUE' && item.enabled)
+                .forEach (item =>
+                    {
+                    allItems.push ({ id: item.id.toString (), name: item.name, type: 'LEAGUE', league: item });
+                    });
+            }
+
+        // Add league buttons from storage
+        const leagueButtons = this.storageService.loadLeagueButtons () || [];
+        leagueButtons.forEach (league =>
+            {
+            allItems.push ({ id: league.id.toString (), name: league.name, type: 'LEAGUE', league: league });
+            });
+
+        // Create a map for quick lookup
+        const itemMap = new Map (allItems.map (item => [`${item.type}:${item.id}`, item]));
+
+        // Build ordered and filtered items
+        const orderedItems = [];
+        const processedKeys = new Set ();
+        
+        // Add items in saved order
+        itemOrder.forEach (itemKey =>
+            {
+            if (itemMap.has (itemKey))
+                {
+                const item = itemMap.get (itemKey);
+                const isVisible = itemsVisibility[itemKey] !== false; // default to true
+                if (isVisible)
+                    {
+                    orderedItems.push (item);
+                    }
+                processedKeys.add (itemKey);
+                }
+            });
+
+        // Add remaining items that weren't in the saved order
         allItems.forEach (item =>
             {
-            if (item.type === 'custom')
+            const itemKey = `${item.type}:${item.id}`;
+            if (!processedKeys.has (itemKey))
+                {
+                const isVisible = itemsVisibility[itemKey] !== false; // default to true
+                if (isVisible)
+                    {
+                    orderedItems.push (item);
+                    }
+                }
+            });
+            
+        // Generate HTML for each visible item
+        orderedItems.forEach (item =>
+            {
+            if (item.type === 'CUSTOM_DISPLAY')
+                {
                 menuHtml += this.generateCustomDisplayItem (item);
-            else
-                menuHtml += this.generateSportItem (item);
+                }
+            else if (item.type === 'SPORT')
+                {
+                menuHtml += this.generateSportItem (item.sport);
+                }
+            else if (item.type === 'LEAGUE')
+                {
+                menuHtml += this.generateLeagueItem (item);
+                }
             });
 
         this.dom.sportsMenuContent.innerHTML = menuHtml;
         this.bindMenuEventListeners ();
-        this.updateSelectedViewLabel();
+        this.updateSelectedViewLabel ();
         }
     //-------------------------------------------------------------------------------------------------
     /**
@@ -71,13 +150,9 @@ export default class MenuView
             submenuHtml += '</div>';
             }
 
-        // Use "TODAY" for the button text and data-attribute when the ID is 0
-        const buttonText = sport.id === 0 ? 'TODAY' : sport.name;
-        const dataName   = sport.id === 0 ? 'TODAY' : sport.name;
-
         return `
             <div class="sport-item" data-sport-id="${sport.id}">
-                <a href="#" class="sport-link" data-sport-id="${sport.id}" data-sport-name="${dataName}">${buttonText}</a>
+                <a href="#" class="sport-link" data-sport-id="${sport.id}" data-sport-name="${sport.name}">${sport.name}</a>
                 ${submenuHtml}
             </div>
         `;
@@ -89,11 +164,26 @@ export default class MenuView
      * @returns {string} The HTML string for the custom display item.
      */
     //-------------------------------------------------------------------------------------------------
-    generateCustomDisplayItem(display)
+    generateCustomDisplayItem (item)
         {
         return `
-            <div class="sport-item custom-display-item" data-sport-id="${display.id}">
-                <a href="#" class="sport-link" data-sport-id="${display.id}" data-sport-name="${display.name}">${display.name}</a>
+            <div class="sport-item custom-display-item" data-sport-id="${item.id}">
+                <a href="#" class="sport-link" data-sport-id="${item.id}" data-sport-name="${item.name}">${item.name}</a>
+            </div>
+        `;
+        }
+    //-------------------------------------------------------------------------------------------------
+    /**
+     * Generates the HTML for a single league item button.
+     * @param {object} league - The league data object.
+     * @returns {string} The HTML string for the league item.
+     */
+    //-------------------------------------------------------------------------------------------------
+    generateLeagueItem (league)
+        {
+        return `
+            <div class="sport-item league-item" data-league-id="${league.id}" data-parent-sport-id="${league.parentSportId}">
+                <a href="#" class="sport-link" data-league-id="${league.id}" data-league-name="${league.name}">${league.name}</a>
             </div>
         `;
         }
@@ -111,7 +201,8 @@ export default class MenuView
                 e.preventDefault ();
                 const id = e.currentTarget.dataset.sportId;
                 const name = e.currentTarget.dataset.sportName;
-                const type = id.startsWith ('C') ? 'CUSTOM_DISPLAY' : 'SPORT';
+                // Check if it's a custom display (starts with 'C') or TODAY/TOMORROW
+                const type = (id.startsWith ('C') || id === 'TODAY' || id === 'TOMORROW') ? 'CUSTOM_DISPLAY' : 'SPORT';
                 this.selectionHandler (type, id, name);
                 });
             });
@@ -124,6 +215,9 @@ export default class MenuView
                 e.preventDefault ();
                 e.stopPropagation ();
                 const customId = e.currentTarget.dataset.sportId;
+                // Don't allow editing of TODAY and TOMORROW
+                if (customId === 'TODAY' || customId === 'TOMORROW')
+                    return;
                 const customDisplay = this.leagueOrderModal.customDisplays.find (d => d.id === customId);
                 if (customDisplay)
                     this.leagueOrderModal.openForEdit (customDisplay);
@@ -131,6 +225,18 @@ export default class MenuView
             });
 
         this.dom.sportsMenuContent.querySelectorAll ('.league-link').forEach (link =>
+            {
+            link.addEventListener ('click', (e) =>
+                {
+                e.preventDefault ();
+                const id = e.currentTarget.dataset.leagueId;
+                const name = e.currentTarget.dataset.leagueName;
+                this.selectionHandler ('LEAGUE', id, name);
+                });
+            });
+
+        // Add event listeners for league items (from Add League Buttons)
+        this.dom.sportsMenuContent.querySelectorAll ('.league-item .sport-link').forEach (link =>
             {
             link.addEventListener ('click', (e) =>
                 {
@@ -154,20 +260,26 @@ export default class MenuView
         
         let chipText = '';
         if (this.state.currentViewType === 'CUSTOM_DISPLAY')
-            chipText = `⭐ ${this.state.currentViewName}`;
+            {
+            // Don't show star for TODAY and TOMORROW since they are special
+            if (this.state.currentViewId === 'TODAY' || this.state.currentViewId === 'TOMORROW')
+                chipText = this.state.currentViewName;
+            else
+                chipText = `⭐ ${this.state.currentViewName}`;
+            }
         else if (this.state.currentViewName)
             chipText = this.state.currentViewName;
 
         if (chipText)
             {
-            const displayTypeDropdown = document.getElementById('display-type-dropdown');
-            if (displayTypeDropdown)
+            const oddsFormatDropdown = document.getElementById ('odds-format-dropdown');
+            if (oddsFormatDropdown)
                 {
-                const chip = document.createElement('span');
+                const chip = document.createElement ('span');
                 chip.className = 'selected-view-chip';
                 chip.id = 'selected-view-label';
                 chip.textContent = chipText;
-                displayTypeDropdown.insertAdjacentElement('afterend', chip);
+                oddsFormatDropdown.insertAdjacentElement ('afterend', chip);
                 }
             }
         this.highlightCurrentSport ();
@@ -180,7 +292,9 @@ export default class MenuView
     highlightCurrentSport ()
         {
         this.clearMenuHighlights();
-        const link = document.querySelector(`.sport-link[data-sport-id="${this.state.currentViewId}"]`);
+        // Handle TODAY and TOMORROW IDs correctly
+        const currentId = this.state.currentViewId;
+        const link = document.querySelector(`.sport-link[data-sport-id="${currentId}"]`);
         if (link)
             link.classList.add('selected');
         }
@@ -189,10 +303,11 @@ export default class MenuView
      * Removes all 'selected' classes from menu items.
      */
     //-------------------------------------------------------------------------------------------------
-    clearMenuHighlights()
+    clearMenuHighlights ()
         {
-        this.dom.sportsMenuContent.querySelectorAll('.sport-link.selected').forEach(link => {
+        this.dom.sportsMenuContent.querySelectorAll('.sport-link.selected').forEach (link =>
+            {
             link.classList.remove('selected');
-        });
+            });
         }
     }
